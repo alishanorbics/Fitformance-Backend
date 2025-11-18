@@ -1,1 +1,111 @@
-# Bet-It-Up-Backend
+# Bet-It-Up -- Backend API
+
+This is the backend API for the **Bet-It-Up** application. It provides
+authentication, database integration, stripe account setup, payments, mailing, and other core
+backend services.
+
+## Features
+
+-   User authentication using JWT
+-   MongoDB database connection
+-   Stripe payment integration
+-   Email service using Nodemailer
+-   Uploads folder support
+-   Environment variable configuration
+-   Structured API architecture
+
+## Tech Stack
+
+-   Node.js
+-   Express.js
+-   MongoDB (Mongoose)
+-   Nodemailer
+-   Stripe API
+
+## Installation
+
+    git clone <your-repository-url>
+    cd bet-it-up
+    npm install
+
+## Environment Variables
+
+Create a `.env` file in the root directory and add the following:
+
+    PORT=8080
+    BASE_URL=<base_url>
+    APP_NAME=bet-it-up
+
+    DB_CONNECTION_URL=mongodb+srv://<username>:<password>@cluster0.mongodb.net
+    DB_NAME=bet-it-up
+
+    JWT_SECRET_KEY=<your_jwt_secret_here>
+
+    MAILING_EMAIL=<your_email_address>
+    MAILING_PASSWORD=<your_email_app_password>
+
+    STRIPE_SECRET_KEY=<your_stripe_secret_key>
+
+**Important:**\
+Do not commit your `.env` file. Add `.env` to `.gitignore`.
+
+## Project Structure
+
+    ├── src/
+    │   ├── controllers/
+    │   ├── routes/
+    │   ├── helpers/
+    │   ├── models/
+    │   ├── middleware/
+    │   ├── config/
+    │   └── utils/
+    ├── uploads/
+    ├── .gitignore
+    ├── package.json
+    └── README.md
+
+## Running the Server
+
+### Development
+
+    npm run dev
+
+### Production
+
+    npm start
+
+The server will run at:\
+`http://localhost:8080`\
+(or the port you set in `.env`)
+
+## Stripe Integration
+
+Add your Stripe secret key in the `.env` file:
+
+    STRIPE_SECRET_KEY=<your_stripe_secret_key>
+
+## Email Configuration
+
+If using Gmail, generate an App Password and use:
+
+    MAILING_EMAIL=<your_email>
+    MAILING_PASSWORD=<your_email_app_password>
+
+## Uploads Folder
+
+Uploaded files are stored in:
+
+    uploads/
+
+Ensure this folder is included in `.gitignore`.
+
+## Security Notes
+
+-   Never expose real secrets publicly
+-   Always use environment variables
+-   Rotate keys immediately if leaked
+-   Enable HTTPS in production
+
+## License
+
+This project is licensed under the MIT License.
