@@ -1,15 +1,16 @@
 {
-  "name": "memorej-backend",
+  "name": "bet-it-up-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for Bet-It-Up betting application",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -28,5 +29,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
