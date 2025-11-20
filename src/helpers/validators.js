@@ -291,3 +291,14 @@ export const CHANGE_PASSWORD_VALIDATOR = Joi.object({
         'string.min': 'Password must be at least 6 characters long',
     })
 })
+
+export const ADD_FUNDS_VALIDATOR = Joi.object({
+    amount: Joi.number()
+        .positive()
+        .required()
+        .messages({
+            'any.required': 'Amount is required',
+            'number.base': 'Amount must be a number',
+            'number.positive': 'Amount must be greater than 0'
+        })
+})
