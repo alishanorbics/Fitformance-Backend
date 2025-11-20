@@ -1,17 +1,20 @@
-import express from 'express'
 import cors from 'cors'
-import helmet from 'helmet'
 import dotenv from 'dotenv'
+import express from 'express'
+import helmet from 'helmet'
 import path from 'path'
 
-import requestLogger from './middleware/requestlog.js'
-import { errorHandler } from './middleware/error.js'
-import routes from './routes/index.js'
 import logger from './config/logger.js'
+import { webhook } from './helpers/stripe.js'
+import { errorHandler } from './middleware/error.js'
+import requestLogger from './middleware/requestlog.js'
+import routes from './routes/index.js'
 
 dotenv.config()
 
 const app = express()
+
+app.post("/stripe-webhook", express.raw({ type: "application/json" }), webhook)
 
 app.use(helmet())
 app.use(cors({ origin: '*' }))

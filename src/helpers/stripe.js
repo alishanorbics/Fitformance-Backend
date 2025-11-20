@@ -1,10 +1,58 @@
-import Stripe from 'stripe'
 import dotenv from 'dotenv'
+import Stripe from 'stripe'
+import logger from '../config/logger.js'
+import Transaction from '../models/transaction.model.js'
 import User from '../models/user.model.js'
+import Wallet from '../models/wallet.model.js'
+import { TRANSACTION_TYPES } from '../utils/index.js'
 
 dotenv.config()
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2022-11-15' })
+
+export const webhook = async (req, res) => {
+
+    let event
+
+    try {
+        const sig = req.headers["stripe-signature"]
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_KEY)
+    } catch (err) {
+        console.error("⚠️ Webhook signature verification failed.", err.message)
+        return res.status(400).send(`Webhook Error: ${err.message}`)
+    }
+
+    if (event.type === 'checkout.session.completed') {
+
+        const session = event.data.object
+        const user = await User.findOne({ stripe_customer_id: session.customer })
+
+        if (user) {
+
+            const wallet = await Wallet.findOne({ user: user._id })
+            wallet.balance += session.amount_total / 100
+            await wallet.save()
+
+            const transaction = new Transaction({
+                wallet: wallet._id,
+                type: TRANSACTION_TYPES.DEPOSIT,
+                amount: session.amount_total / 100,
+                reference: session.id,
+                description: `Deposit via Stripe Checkout`,
+                balance_after: wallet.balance
+            })
+
+            await transaction.save()
+
+            logger.info(`${user.name} has desposit ${ession.amount_total / 100}`)
+
+        }
+
+    }
+
+    return res.json({ received: true })
+
+}
 
 export const createPackage = async ({ name, description, amount, interval = 'month', currency = 'usd' }) => {
 
@@ -245,6 +293,62 @@ export const getActiveSubscription = async (id) => {
         current_period_end: new Date(active_subscription.current_period_end * 1000),
         cancel_at_period_end: active_subscription.cancel_at_period_end,
         status: active_subscription.status
+    }
+
+}
+
+export const addFundsCheckoutSession = async (amount, user_id) => {
+
+    const user = await User.findById(user_id)
+
+    if (!user) throw new Error("User not found")
+    if (!amount || amount <= 0) throw new Error("Invalid amount")
+
+    const amount_in_cents = Math.round(amount * 100)
+
+    let customer_id = user.stripe_customer_id
+
+    if (!customer_id) {
+
+        const customer = await stripe.customers.create({
+            email: user.email,
+            name: user.name,
+            metadata: {
+                user_id: user._id.toString()
+            }
+        })
+
+        customer_id = customer.id
+        user.stripe_customer_id = customer_id
+        await user.save()
+
+    }
+
+    const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        customer: customer_id,
+        payment_method_types: ["card"],
+        line_items: [
+            {
+                price_data: {
+                    currency: "usd",
+                    product_data: { name: "Add Funds To Wallet" },
+                    unit_amount: amount_in_cents
+                },
+                quantity: 1
+            }
+        ],
+        metadata: {
+            user_id: user._id.toString(),
+            amount: amount_in_cents
+        },
+        success_url: "https://www.facebook.com/",
+        cancel_url: "https://www.facebook.com/",
+    })
+
+    return {
+        checkout_url: session.url,
+        session_id: session.id
     }
 
 }
