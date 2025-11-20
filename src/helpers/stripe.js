@@ -339,8 +339,7 @@ export const addFundsCheckoutSession = async (amount, user_id) => {
             }
         ],
         metadata: {
-            user_id: user._id.toString(),
-            amount: amount_in_cents
+            user_id: user._id.toString()
         },
         success_url: "https://www.facebook.com/",
         cancel_url: "https://www.facebook.com/",
