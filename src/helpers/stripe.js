@@ -37,14 +37,14 @@ export const webhook = async (req, res) => {
                 wallet: wallet._id,
                 type: TRANSACTION_TYPES.DEPOSIT,
                 amount: session.amount_total / 100,
-                reference: session.id,
+                external_reference: session.id,
                 description: `Deposit via Stripe Checkout`,
                 balance_after: wallet.balance
             })
 
             await transaction.save()
 
-            logger.info(`${user.name} has desposit ${ession.amount_total / 100}`)
+            logger.info(`${user.name} has desposit ${session.amount_total / 100}`)
 
         }
 
