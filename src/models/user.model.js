@@ -77,6 +77,9 @@ const user_schema = mongoose.Schema({
         required: function () {
             return this.auth_provider !== AUTH_TYPES.EMAIL
         }
+    },
+    stripe_customer_id: {
+        type: String
     }
 }, {
     id: false,
