@@ -120,9 +120,7 @@ export const calculateAge = (date_of_birth) => {
 
 }
 
-export const formatCurrency = (cents, currency = 'USD', sign = '$') => {
-
-    const amount = cents / 100
+export const formatCurrency = (amount, currency = 'USD', sign = '$') => {
 
     const formatted = `${sign}${amount.toLocaleString(undefined, {
         minimumFractionDigits: 2,
