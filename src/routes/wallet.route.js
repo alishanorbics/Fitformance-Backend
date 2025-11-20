@@ -1,8 +1,12 @@
 import express from 'express'
-import { getBalance, getTransactions } from '../controllers/wallet.controller.js'
+import { addFunds, getBalance, getTransactions } from '../controllers/wallet.controller.js'
+import { ADD_FUNDS_VALIDATOR } from '../helpers/validators.js'
 import { AuthVerifier } from '../middleware/auth.middleware.js'
+import validator from '../middleware/validator.js'
 
 const router = express.Router()
+
+router.post('/add-funds', AuthVerifier, validator(ADD_FUNDS_VALIDATOR), addFunds)
 
 router.get('/balance', AuthVerifier, getBalance)
 

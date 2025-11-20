@@ -3,6 +3,34 @@ import { buildPaginationResponse, getPagination } from '../helpers/pagination.js
 import Wallet from '../models/wallet.model.js'
 import Transaction from '../models/transaction.model.js'
 import { searchRegex } from '../utils/index.js'
+import { addFundsCheckoutSession } from '../helpers/stripe.js'
+
+export const addFunds = async (req, res, next) => {
+    try {
+
+        const { decoded, body } = req
+        const { amount } = body
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Amount must be greater than 0.'
+            })
+        }
+
+        const data = await addFundsCheckoutSession(amount, decoded.id)
+
+        return res.status(200).json({
+            success: true,
+            message: 'Stripe checkout session created successfully.',
+            data
+        })
+
+    } catch (error) {
+        logger.error(`Add Funds Error: ${error.message}`)
+        next(error)
+    }
+}
 
 export const getBalance = async (req, res, next) => {
     try {
