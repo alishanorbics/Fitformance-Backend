@@ -22,8 +22,6 @@ export const webhook = async (req, res) => {
         return res.status(400).send(`Webhook Error: ${err.message}`)
     }
 
-    console.log("Webhook Event Called", JSON.stringify(event, null, 2))
-
     if (event.type === 'checkout.session.completed') {
 
         const session = event.data.object
@@ -50,6 +48,22 @@ export const webhook = async (req, res) => {
 
         }
 
+    }
+
+    return res.json({ received: true })
+
+}
+
+export const connectedAccountWebhook = async (req, res) => {
+
+    let event
+
+    try {
+        const sig = req.headers["stripe-signature"]
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_KEY)
+    } catch (err) {
+        console.error("⚠️ Webhook signature verification failed.", err.message)
+        return res.status(400).send(`Webhook Error: ${err.message}`)
     }
 
     return res.json({ received: true })
