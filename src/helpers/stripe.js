@@ -351,3 +351,76 @@ export const addFundsCheckoutSession = async (amount, user_id) => {
     }
 
 }
+
+export const createStripeAccount = async (user_id) => {
+
+    const user = await User.findById(user_id)
+
+    if (!user) {
+        throw new Error('User not found')
+    }
+
+    let wallet = await Wallet.findOne({ user: user_id })
+
+    if (wallet.stripe_account_id) {
+
+        const account_link = await stripe.accountLinks.create({
+            account: wallet.stripe_account_id,
+            refresh_url: `${process.env.BASE_URL}/stripe/refresh`,
+            return_url: `${process.env.BASE_URL}/stripe/success`,
+            type: 'account_onboarding'
+        })
+
+        return {
+            stripe_account_id: wallet.stripe_account_id,
+            onboarding_url: account_link.url
+        }
+
+    }
+
+    const account = await stripe.accounts.create({
+        type: 'express',
+        country: 'US',
+        email: user.email,
+        capabilities: {
+            transfers: { requested: true }
+        },
+        metadata: {
+            user_id: user._id.toString(),
+            wallet_id: wallet._id.toString()
+        }
+    })
+
+    wallet.stripe_account_id = account.id
+    wallet.stripe_onboarding_complete = false
+    await wallet.save()
+
+    const account_link = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${process.env.BASE_URL}/stripe/refresh`,
+        return_url: `${process.env.BASE_URL}/stripe/success`,
+        type: 'account_onboarding'
+    })
+
+    return {
+        stripe_account_id: account.id,
+        onboarding_url: account_link.url
+    }
+
+}
+
+export const createPayout = async ({ stripe_account_id, amount }) => {
+
+    const payout = await stripe.payouts.create(
+        {
+            amount: Math.round(amount * 100),
+            currency: 'usd'
+        },
+        {
+            stripeAccount: stripe_account_id
+        }
+    )
+
+    return payout.id
+
+}
