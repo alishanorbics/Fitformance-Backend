@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 import { encryptData } from '../helpers/encryption.js'
-import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_GENDERS, ENUM_ROLES, REGEX, ROLES } from '../utils/index.js'
+import { AUTH_TYPES, ENUM_AUTH_TYPES, ENUM_GENDERS, ENUM_ROLES, REGEX, ROLES } from '../utils/index.js'
 
 dotenv.config()
 
@@ -36,11 +36,12 @@ const user_schema = mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ENUM_GENDERS
+        enum: ENUM_GENDERS,
+        default: null
     },
     image: {
         type: String,
-        default: DUMMY_USER_IMAGE_PATH
+        default: null
     },
     country_code: {
         type: String,
@@ -109,10 +110,21 @@ user_schema.pre('findOneAndUpdate', (async function (next) {
 }))
 
 user_schema.virtual('image_url').get(function () {
+
+    if (!this.image) {
+        return null
+    }
+
     if (this.image && this.image.startsWith('http')) {
         return this.image
     }
+
     return `${process.env.BASE_URL}${this.image}`
+
+})
+
+user_schema.virtual('profile_completed').get(function () {
+    return !this.gender
 })
 
 user_schema.index({ email: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } })
