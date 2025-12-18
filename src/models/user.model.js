@@ -124,7 +124,7 @@ user_schema.virtual('image_url').get(function () {
 })
 
 user_schema.virtual('profile_completed').get(function () {
-    return !this.gender
+    return !!this.gender
 })
 
 user_schema.index({ email: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } })
