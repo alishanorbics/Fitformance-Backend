@@ -11,6 +11,6 @@ router.get('/my-profile', AuthVerifier, getMyProfile)
 
 router.post('/change-password', AuthVerifier, validator(CHANGE_PASSWORD_VALIDATOR), changePassword)
 
-router.patch('/update', AuthVerifier, upload('user').single('image'), validator(UPDATE_PROFILE_VALIDATOR), updateProfile)
+router.patch('/update', AuthVerifier, upload('user').single('image'), validator(UPDATE_PROFILE_VALIDATOR, { optional: true }), updateProfile)
 
 export default router
