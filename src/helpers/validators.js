@@ -292,6 +292,49 @@ export const CHANGE_PASSWORD_VALIDATOR = Joi.object({
     })
 })
 
+export const UPDATE_PROFILE_VALIDATOR = Joi.object({
+    name: Joi.string().min(2).max(50)
+        .required()
+        .messages({
+            'any.required': 'Name is required.',
+            'string.empty': 'Name cannot be empty.',
+            'string.min': 'Name must be at least 2 characters long.',
+            'string.max': 'Name cannot exceed 50 characters.'
+        }),
+
+    username: Joi.string()
+        .required()
+        .messages({
+            'any.required': 'Username is required.',
+            'string.empty': 'Username cannot be empty.'
+        }),
+
+    country_code: Joi.string()
+        .required()
+        .messages({
+            'any.required': 'Country code is required.',
+            'string.empty': 'Country code cannot be empty.'
+        }),
+
+    dialing_code: Joi.string()
+        .required()
+        .messages({
+            'any.required': 'Dialing code is required.',
+            'string.empty': 'Dialing code cannot be empty.'
+        }),
+
+    phone: Joi.string()
+        .required()
+        .messages({
+            'any.required': 'Phone number is required.',
+            'string.empty': 'Phone number cannot be empty.'
+        }),
+
+    gender: Joi.string()
+        .optional()
+        .allow('')
+})
+
 export const ADD_FUNDS_VALIDATOR = Joi.object({
     amount: Joi.number()
         .positive()
