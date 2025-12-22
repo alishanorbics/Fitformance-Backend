@@ -27,7 +27,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
 app.use(`/${process.env.APP_NAME}/v1/api`, routes)
 app.get('/health', (req, res) => res.status(200).send('OK'))
-app.use('/uploads', express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', express.static(path.join(process.cwd(), "uploads")))
 
 app.use((req, res) => {
     res.status(404).json({ success: false, message: 'Route not found' })
