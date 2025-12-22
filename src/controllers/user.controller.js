@@ -119,3 +119,38 @@ export const updateProfile = async (req, res, next) => {
         next(error)
     }
 }
+
+export const removeImage = async (req, res, next) => {
+    try {
+
+        const { decoded } = req
+
+        let user = await User.findById(decoded.id)
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            })
+        }
+
+        if (user?.image) {
+            removeFiles(user?.image)
+        }
+
+        user.image = null
+        await user.save()
+
+        logger.info(`Image removed successfully for: ${user.email}`)
+
+        return res.status(200).json({
+            success: true,
+            message: "Image removed successfully.",
+            data: { user }
+        })
+
+    } catch (error) {
+        logger.error(`Remove Image Error: ${error.message}`)
+        next(error)
+    }
+}

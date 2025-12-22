@@ -1,5 +1,5 @@
 import express from 'express'
-import { changePassword, getMyProfile, updateProfile } from '../controllers/user.controller.js'
+import { changePassword, getMyProfile, removeImage, updateProfile } from '../controllers/user.controller.js'
 import { CHANGE_PASSWORD_VALIDATOR, UPDATE_PROFILE_VALIDATOR } from '../helpers/validators.js'
 import { AuthVerifier } from '../middleware/auth.middleware.js'
 import upload from '../middleware/upload.middleware.js'
@@ -12,5 +12,7 @@ router.get('/my-profile', AuthVerifier, getMyProfile)
 router.post('/change-password', AuthVerifier, validator(CHANGE_PASSWORD_VALIDATOR), changePassword)
 
 router.patch('/update', AuthVerifier, upload('user').single('image'), validator(UPDATE_PROFILE_VALIDATOR, { optional: true }), updateProfile)
+
+router.post('/remove-image', AuthVerifier, removeImage)
 
 export default router
