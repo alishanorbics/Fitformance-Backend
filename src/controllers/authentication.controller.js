@@ -318,7 +318,11 @@ export const logout = async (req, res, next) => {
     try {
 
         const { decoded, body } = req
-        const { device_id } = body
+        let device_id = null
+
+        if (body) {
+            device_id = body?.device_id
+        }
 
         const user = await User.findById(decoded.id)
 
@@ -329,7 +333,7 @@ export const logout = async (req, res, next) => {
             })
         }
 
-        if (device_id && user.device_ids.includes(device_id)) {
+        if (device_id && user?.device_ids.includes(device_id)) {
             user.device_ids = user.device_ids.filter(id => id !== device_id)
             await user.save()
         }
