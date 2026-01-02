@@ -19,6 +19,6 @@ router.post('/verify-otp', validator(VERIFY_OTP_VALIDATOR), verifyOtp)
 
 router.post('/set-password', validator(SET_PASSWORD_VALIDATOR), setPassword)
 
-router.post('/logout', AuthVerifier, validator(LOGOUT_VALIDATOR), logout)
+router.post('/logout', AuthVerifier, validator(LOGOUT_VALIDATOR, { optional: true }), logout)
 
 export default router
