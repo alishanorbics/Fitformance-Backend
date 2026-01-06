@@ -1,14 +1,28 @@
+import fs from 'fs/promises'
+import path from 'path'
 import logger from '../config/logger.js'
 
 export const getContent = async (req, res, next) => {
     try {
 
-        const base = `https://${req.host}/uploads/`
+        const uploads_dir = path.join(process.cwd(), 'uploads')
 
-        const data = {
-            about_us: base + "about-us.html",
-            privacy_policy: base + "privacy-policy.html",
-            terms: base + "terms.html",
+        const files = {
+            about_us: path.join(uploads_dir, 'about-us.html'),
+            privacy_policy: path.join(uploads_dir, 'privacy-policy.html'),
+            terms: path.join(uploads_dir, 'terms.html'),
+        }
+
+        const data = {}
+
+        for (const [key, file_path] of Object.entries(files)) {
+            try {
+                const content = await fs.readFile(file_path, 'utf-8')
+                data[key] = content
+            } catch (err) {
+                logger.error(`Error reading ${key}: ${err.message}`)
+                data[key] = null
+            }
         }
 
         return res.status(200).json({
@@ -17,7 +31,7 @@ export const getContent = async (req, res, next) => {
         })
 
     } catch (error) {
-        logger.error(`Add Funds Error: ${error.message}`)
+        logger.error(`Get Content Error: ${error.message}`)
         next(error)
     }
 }
