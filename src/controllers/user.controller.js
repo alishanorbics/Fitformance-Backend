@@ -3,6 +3,29 @@ import { compareData } from '../helpers/encryption.js'
 import { removeFiles } from '../helpers/folder.js'
 import User from '../models/user.model.js'
 
+export const getUsers = async (req, res, next) => {
+
+    try {
+        const { decoded } = req
+
+        const users = await User.find()
+            .select("-password")
+            .lean({ virtuals: true })
+
+        logger.info(`User listing fetched`)
+
+        return res.status(200).json({
+            success: true,
+            message: "Users fetched successfully.",
+            data: users
+        })
+
+    } catch (error) {
+        logger.error(`Get Users Error: ${error.message}`)
+        next(error)
+    }
+}
+
 export const getMyProfile = async (req, res, next) => {
 
     try {

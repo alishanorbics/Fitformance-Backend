@@ -1,11 +1,13 @@
 import express from 'express'
-import { changePassword, getMyProfile, removeImage, updateProfile } from '../controllers/user.controller.js'
+import { changePassword, getMyProfile, getUsers, removeImage, updateProfile } from '../controllers/user.controller.js'
 import { CHANGE_PASSWORD_VALIDATOR, UPDATE_PROFILE_VALIDATOR } from '../helpers/validators.js'
 import { AuthVerifier } from '../middleware/auth.middleware.js'
 import upload from '../middleware/upload.middleware.js'
 import validator from '../middleware/validator.js'
 
 const router = express.Router()
+
+router.get('/get', AuthVerifier, getUsers)
 
 router.get('/my-profile', AuthVerifier, getMyProfile)
 
