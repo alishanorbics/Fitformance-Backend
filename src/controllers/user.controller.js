@@ -1,6 +1,7 @@
-import User from '../models/user.model.js'
 import logger from '../config/logger.js'
+import { compareData } from '../helpers/encryption.js'
 import { removeFiles } from '../helpers/folder.js'
+import User from '../models/user.model.js'
 
 export const getMyProfile = async (req, res, next) => {
 
@@ -47,7 +48,7 @@ export const changePassword = async (req, res, next) => {
             })
         }
 
-        const matched = await bcrypt.compare(old_password, user.password)
+        const matched = await compareData(old_password, user.password)
 
         if (!matched) {
             return res.status(400).json({
