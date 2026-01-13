@@ -10,6 +10,7 @@ export const getTransactions = async (req, res, next) => {
 
         const transactions = await Transaction.find(filters)
             .sort(sort)
+            .populate({ path: "wallet", select: "user", populate: { path: "user", select: "name email image image_url" } })
             .lean({ virtuals: true })
 
         logger.info(`Transaction listing fetched`)
