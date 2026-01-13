@@ -3,10 +3,10 @@ import logger from '../config/logger.js'
 import { removeFiles } from '../helpers/folder.js'
 import { buildPaginationResponse, getPagination } from '../helpers/pagination.js'
 import Bet from '../models/bet.model.js'
+import Transaction from '../models/transaction.model.js'
 import User from '../models/user.model.js'
 import Wallet from '../models/wallet.model.js'
-import Transaction from '../models/transaction.model.js'
-import { BET_PARTICIPATION_STATUS, BET_PROCCESS_STATUS, BET_STATUS, DUMMY_USER_IMAGE_PATH, ROLES, searchRegex, TRANSACTION_TYPES } from '../utils/index.js'
+import { BET_PARTICIPATION_STATUS, BET_PROCCESS_STATUS, BET_STATUS, ROLES, searchRegex, TRANSACTION_TYPES } from '../utils/index.js'
 
 export const addBet = async (req, res, next) => {
 
@@ -399,7 +399,7 @@ export const getBets = async (req, res, next) => {
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-            .select('image title date start_time end_time status amount')
+            .select('image title date start_time end_time status amount createdAt')
             .lean({ virtuals: true })
 
         return res.status(200).json({
