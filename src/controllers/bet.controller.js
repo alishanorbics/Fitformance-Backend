@@ -400,6 +400,10 @@ export const getBets = async (req, res, next) => {
             .skip(skip)
             .limit(limit)
             .select('image title date start_time end_time status amount createdAt')
+            .populate({
+                path: 'user',
+                select: 'name email'
+            })
             .lean({ virtuals: true })
 
         return res.status(200).json({
