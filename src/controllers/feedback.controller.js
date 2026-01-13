@@ -33,7 +33,7 @@ export const addFeedback = async (req, res, next) => {
     }
 }
 
-export const getFeedbacks = (async (req, res) => {
+export const getFeedbacks = (async (req, res, next) => {
     try {
 
         const { query } = req
