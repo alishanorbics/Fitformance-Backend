@@ -1,4 +1,5 @@
-import Transaction from "../models/transaction.model"
+import logger from "../config/logger.js"
+import Transaction from "../models/transaction.model.js"
 
 export const getTransactions = async (req, res, next) => {
 
@@ -7,7 +8,7 @@ export const getTransactions = async (req, res, next) => {
         let filters = {}
         let sort = { createdAt: - 1 }
 
-        const users = await Transaction.find(filters)
+        const transactions = await Transaction.find(filters)
             .sort(sort)
             .lean({ virtuals: true })
 
@@ -16,7 +17,7 @@ export const getTransactions = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: "Transactions fetched successfully.",
-            data: users
+            data: transactions
         })
 
     } catch (error) {
