@@ -2,14 +2,24 @@ import logger from '../config/logger.js'
 import { compareData } from '../helpers/encryption.js'
 import { removeFiles } from '../helpers/folder.js'
 import User from '../models/user.model.js'
+import { ROLES } from '../utils/index.js'
 
 export const getUsers = async (req, res, next) => {
 
     try {
+
         const { decoded } = req
+
+        let filters = {}
+        let sort = { createdAt: - 1 }
+
+        if (decoded.role === ROLES.ADMIN) {
+            filters.role = ROLES.USER
+        }
 
         const users = await User.find()
             .select("-password")
+            .sort(sort)
             .lean({ virtuals: true })
 
         logger.info(`User listing fetched`)
