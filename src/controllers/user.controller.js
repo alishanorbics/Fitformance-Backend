@@ -17,7 +17,7 @@ export const getUsers = async (req, res, next) => {
             filters.role = ROLES.USER
         }
 
-        const users = await User.find()
+        const users = await User.find(filters)
             .select("-password")
             .sort(sort)
             .lean({ virtuals: true })
