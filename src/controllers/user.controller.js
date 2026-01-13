@@ -36,6 +36,26 @@ export const getUsers = async (req, res, next) => {
     }
 }
 
+export const getUserById = async (req, res, next) => {
+    try {
+
+        const { params } = req
+        const { id } = params
+
+        const user = await User.findById(id).lean({ virtuals: true })
+
+        return res.status(200).json({
+            success: true,
+            message: 'User fetched successfully.',
+            data: user
+        })
+
+    } catch (error) {
+        logger.error(`Get User by ID Error: ${error.message}`)
+        next(error)
+    }
+}
+
 export const getMyProfile = async (req, res, next) => {
 
     try {
