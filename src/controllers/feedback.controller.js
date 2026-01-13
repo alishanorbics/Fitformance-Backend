@@ -63,7 +63,7 @@ export const getFeedbacks = (async (req, res) => {
             ...buildPaginationResponse(feedbacks, total, page, page_size),
         })
 
-    } catch (e) {
+    } catch (error) {
         logger.error(`Get Feedbacks Error: ${error.message}`)
         next(error)
     }
