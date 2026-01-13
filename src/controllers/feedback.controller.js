@@ -46,13 +46,16 @@ export const getFeedbacks = (async (req, res, next) => {
             createdAt: -1
         }
 
-        let projection = {}
-
         if (search) {
             filter.name = searchRegex(search)
         }
 
-        const feedbacks = await Feedback.find(filter, projection, options).populate({ path: "user", select: "name email picture" }).sort(sort).skip(skip).limit(limit)
+        const feedbacks = await Feedback.find(filter)
+            .populate({ path: "user", select: "name email picture" })
+            .sort(sort)
+            .skip(skip)
+            .limit(limit)
+
         const total = await Feedback.countDocuments(filter)
 
         logger.info(`Feedbacks listing fetched`)
