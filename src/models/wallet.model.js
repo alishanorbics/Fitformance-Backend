@@ -31,7 +31,10 @@ const wallet_schema = new mongoose.Schema({
 })
 
 wallet_schema.virtual('formatted_balance').get(function () {
-    return formatCurrency(this.balance, 'USD', '$')
+    if (this.balance) {
+        return formatCurrency(this.balance, 'USD', '$')
+    }
+    return null
 })
 
 wallet_schema.plugin(mongooseLeanVirtuals)
