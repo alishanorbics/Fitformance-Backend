@@ -208,3 +208,37 @@ export const removeImage = async (req, res, next) => {
         next(error)
     }
 }
+
+export const toggleStatus = async (req, res, next) => {
+
+    try {
+
+        const { decoded } = req
+
+        let user = await User.findById(decoded.id)
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            })
+        }
+
+        user.active = !user.active
+
+        await user.save()
+
+        logger.info(`User status toggled: ${user.email} → ${user.active ? 'ACTIVE' : 'INACTIVE'}`)
+
+        return res.status(200).json({
+            success: true,
+            message: `User's account ${user.active ? 'activated' : 'deactivated'} successfully.`,
+            data: user
+        })
+
+    } catch (error) {
+        logger.error(`Toggle User Status Error: ${error.message}`)
+        next(error)
+    }
+
+}
