@@ -1,4 +1,4 @@
-import logger from "../config/logger"
+import logger from "../config/logger.js"
 import Notification from "../models/notification.model.js"
 import User from "../models/user.model.js"
 import { ROLES } from "../utils"
