@@ -26,7 +26,7 @@ app.use(requestLogger)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-app.use('/uploads', express.static(path.join(__dirname, "uploads")))
+app.use('/uploads', express.static(path.join(__dirname, "../uploads")))
 app.use(`/${process.env.APP_NAME}/v1/api`, routes)
 app.get('/health', (req, res) => res.status(200).send('OK'))
 
