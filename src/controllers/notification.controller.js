@@ -11,8 +11,7 @@ export const getNotifications = async (req, res, next) => {
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {
-            'recipients.user': decoded.id,
-            active: true
+            'recipients.user': decoded.id
         }
 
         if (read === 'true') {
