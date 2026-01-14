@@ -72,23 +72,24 @@ export const getFeedbacks = (async (req, res, next) => {
     }
 })
 
-const getFeedbackById = (async (req, res) => {
+export const getFeedbackById = async (req, res, next) => {
     try {
 
-        let id = req.params.id
+        const { params } = req
+        const { id } = params
 
-        let feedback = await Feedback.findById(id).populate({ path: "user", select: "role" })
+        const feedback = await Feedback.findById(id)
+            .populate('user', 'name email image')
+            .lean({ virtuals: true })
 
-        return res.status(200).send({
+        return res.status(200).json({
             success: true,
+            message: 'Feedback fetched successfully.',
             data: feedback
         })
 
-    } catch (e) {
-        console.log("Error Message :: ", e)
-        res.status(400).send({
-            success: false,
-            message: e.message
-        })
+    } catch (error) {
+        logger.error(`Get Feedback by ID Error: ${error.message}`)
+        next(error)
     }
-})
+}
