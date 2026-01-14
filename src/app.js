@@ -18,7 +18,11 @@ const app = express()
 app.post("/stripe-webhook", express.raw({ type: "application/json" }), webhook)
 app.post("/stripe-connected-account-webhook", express.raw({ type: "application/json" }), connectedAccountWebhook)
 
-app.use(helmet())
+app.use(
+    helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+    })
+)
 app.use(cors({ origin: '*' }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
