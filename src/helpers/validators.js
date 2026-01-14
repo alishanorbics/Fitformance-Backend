@@ -342,3 +342,29 @@ export const ADD_FUNDS_VALIDATOR = Joi.object({
             'number.positive': 'Amount must be greater than 0'
         })
 })
+
+export const CREATE_DISPUTE_VALIDATOR = Joi.object({
+    bet: Joi.string()
+        .required()
+        .custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.message(`Invalid Bet ID: ${value}`)
+            }
+            return value
+        })
+        .messages({
+            'any.required': 'Bet ID is required.',
+            'string.empty': 'Bet ID cannot be empty.',
+        }),
+    reason: Joi.string()
+        .trim()
+        .min(5)
+        .max(500)
+        .required()
+        .messages({
+            'any.required': 'Reason is required.',
+            'string.empty': 'Reason cannot be empty.',
+            'string.min': 'Reason must be at least 5 characters long.',
+            'string.max': 'Reason cannot exceed 500 characters.',
+        }),
+})
