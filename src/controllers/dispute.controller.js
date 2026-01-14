@@ -18,7 +18,7 @@ export const getDisputes = async (req, res, next) => {
         }
 
         const disputes = await Dispute.find(filter)
-            .populate({ path: 'user', select: 'name email picture' })
+            .populate({ path: 'user', select: 'name email image' })
             .populate({ path: 'bet', select: 'title question amount status image' })
             .sort({ createdAt: -1 })
             .skip(skip)
