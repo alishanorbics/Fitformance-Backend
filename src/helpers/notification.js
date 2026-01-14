@@ -1,7 +1,7 @@
 import logger from "../config/logger.js"
 import Notification from "../models/notification.model.js"
 import User from "../models/user.model.js"
-import { ROLES } from "../utils"
+import { ROLES } from "../utils/index.js"
 
 export const sendNotification = async ({ title, message, user_ids, metadata, admin = false }) => {
 
