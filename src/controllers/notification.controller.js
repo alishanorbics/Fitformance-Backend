@@ -1,9 +1,9 @@
 import logger from "../config/logger.js"
-import { buildPaginationResponse, getPagination } from "../helpers/pagination"
+import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Notification from '../models/notification.model.js'
 
 export const getNotifications = async (req, res, next) => {
-    
+
     try {
 
         const { query, decoded } = req
