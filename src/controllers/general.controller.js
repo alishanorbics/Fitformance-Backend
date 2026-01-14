@@ -1,6 +1,32 @@
 import fs from 'fs/promises'
 import path from 'path'
 import logger from '../config/logger.js'
+import User from '../models/user.model.js'
+import { ROLES } from '../utils/index.js'
+
+export const getDashboard = async (req, res, next) => {
+    try {
+
+        const users = await User.countDocuments({ role: ROLES.USER })
+        const active_users = await User.countDocuments({ role: ROLES.USER, active: true })
+        const unresolved_disputes = await User.countDocuments({ role: ROLES.USER, active: true })
+
+        const data = {
+            users,
+            active_users,
+            unresolved_disputes
+        }
+
+        return res.status(200).json({
+            success: true,
+            data
+        })
+
+    } catch (error) {
+        logger.error(`Get Dashboard Error: ${error.message}`)
+        next(error)
+    }
+}
 
 export const getContent = async (req, res, next) => {
     try {
