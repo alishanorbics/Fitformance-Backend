@@ -1,15 +1,16 @@
 import fs from 'fs/promises'
 import path from 'path'
 import logger from '../config/logger.js'
+import Dispute from '../models/dispute.model.js'
 import User from '../models/user.model.js'
-import { ROLES } from '../utils/index.js'
+import { DISPUTE_STATUS, ROLES } from '../utils/index.js'
 
 export const getDashboard = async (req, res, next) => {
     try {
 
         const users = await User.countDocuments({ role: ROLES.USER })
         const active_users = await User.countDocuments({ role: ROLES.USER, active: true })
-        const unresolved_disputes = await User.countDocuments({ role: ROLES.USER, active: true })
+        const unresolved_disputes = await Dispute.countDocuments({ status: DISPUTE_STATUS.PENDING })
 
         const data = {
             users,
