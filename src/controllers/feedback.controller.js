@@ -1,4 +1,5 @@
 import logger from "../config/logger.js"
+import { sendNotification } from "../helpers/notification.js"
 import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Feedback from "../models/feedback.model.js"
 import { searchRegex } from "../utils/index.js"
@@ -20,6 +21,13 @@ export const addFeedback = async (req, res, next) => {
         await feedback.save()
 
         logger.info(`Feedback submitted by: ${name} (${email})`)
+
+        await sendNotification({
+            title: 'New Feedback Received',
+            message: `Feedback submitted by ${name} (${email}).`,
+            metadata: { type: 'feedback', id: feedback._id },
+            admin: true
+        })
 
         return res.status(201).json({
             success: true,
