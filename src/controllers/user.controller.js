@@ -213,9 +213,9 @@ export const toggleStatus = async (req, res, next) => {
 
     try {
 
-        const { decoded } = req
+        const { params } = req
 
-        let user = await User.findById(decoded.id)
+        let user = await User.findById(params.id)
 
         if (!user) {
             return res.status(404).json({
