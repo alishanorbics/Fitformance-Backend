@@ -3,9 +3,9 @@ import Notification from "../models/notification.model.js"
 import User from "../models/user.model.js"
 import { ROLES } from "../utils/index.js"
 
-export const sendNotification = async ({ title, message, user_ids, metadata, admin = false }) => {
+export const sendNotification = async ({ title, message, user_ids = [], metadata = null, admin = false }) => {
 
-    if (!title || !message || !user_ids) {
+    if (!title || !message) {
         throw new Error('Invalid parameters for send notification.')
     }
 
