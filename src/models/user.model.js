@@ -11,16 +11,6 @@ const user_schema = mongoose.Schema({
         type: String,
         required: true
     },
-    username: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: true,
-        lowercase: true,
-        minlength: 3,
-        maxlength: 30,
-        match: REGEX.USERNAME
-    },
     email: {
         type: String,
         required: true,
@@ -34,10 +24,13 @@ const user_schema = mongoose.Schema({
             return this.auth_provider === AUTH_TYPES.EMAIL
         }
     },
-    gender: {
+    age: {
+        type: Number,
+        required: true
+    },
+    injury: {
         type: String,
-        enum: ENUM_GENDERS,
-        default: null
+        required: true
     },
     image: {
         type: String,
