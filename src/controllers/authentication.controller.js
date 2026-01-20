@@ -5,7 +5,6 @@ import { compareData } from '../helpers/encryption.js'
 import { generateToken, verifyToken } from '../helpers/token.js'
 import Otp from '../models/otp.model.js'
 import User from '../models/user.model.js'
-import Wallet from '../models/wallet.model.js'
 import { generateOtp, ROLES } from '../utils/index.js'
 
 dotenv.config()
@@ -25,7 +24,8 @@ export const signup = async (req, res, next) => {
             country_code,
             dialing_code,
             phone,
-            username
+            age,
+            injury
         } = body
 
         const exists_with_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 })
@@ -39,17 +39,6 @@ export const signup = async (req, res, next) => {
             })
         }
 
-        const exists_with_username = await User.findOne({ username }).collation({ locale: 'en', strength: 2 })
-
-        if (exists_with_username) {
-            await session.abortTransaction()
-            session.endSession()
-            return res.status(409).json({
-                success: false,
-                message: 'Username already taken.',
-            })
-        }
-
         let payload = {
             name,
             email,
@@ -57,7 +46,8 @@ export const signup = async (req, res, next) => {
             country_code,
             dialing_code,
             phone,
-            username
+            age,
+            injury
         }
 
         if (file && file.path) {
@@ -68,11 +58,6 @@ export const signup = async (req, res, next) => {
         await user.save({ session })
 
         logger.info(`User registered successfully: ${email}`)
-
-        let wallet = new Wallet({ user: user._id })
-        await wallet.save({ session })
-
-        logger.info(`Wallet created successfully for user: ${user.name}`)
 
         await session.commitTransaction()
         session.endSession()
@@ -188,9 +173,9 @@ export const forgetPassword = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: 'OTP generated successfully and has been sent to email.',
+            message: `OTP has been sent to email. ${otp} (For testing purposes, OTP is included in the response)`,
             data: {
-                otp
+                email
             },
         })
 

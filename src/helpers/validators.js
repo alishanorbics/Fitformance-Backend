@@ -28,11 +28,18 @@ export const SIGNUP_VALIDATOR = Joi.object({
             'string.min': 'Password must be at least 6 characters long.'
         }),
 
-    username: Joi.string()
+    age: Joi.number()
         .required()
         .messages({
-            'any.required': 'Username is required.',
-            'string.empty': 'Username cannot be empty.'
+            'any.required': 'Age is required.',
+            'string.empty': 'Age cannot be empty.'
+        }),
+
+    injury: Joi.string()
+        .required()
+        .messages({
+            'any.required': 'Injury is required.',
+            'string.empty': 'Injury cannot be empty.'
         }),
 
     country_code: Joi.string()
@@ -55,10 +62,6 @@ export const SIGNUP_VALIDATOR = Joi.object({
             'any.required': 'Phone number is required.',
             'string.empty': 'Phone number cannot be empty.'
         }),
-
-    gender: Joi.string()
-        .optional()
-        .allow('')
 })
 
 export const LOGIN_VALIDATOR = Joi.object({
@@ -303,12 +306,6 @@ export const UPDATE_PROFILE_VALIDATOR = Joi.object({
         })
         .optional(),
 
-    username: Joi.string()
-        .messages({
-            'string.empty': 'Username cannot be empty.'
-        })
-        .optional(),
-
     country_code: Joi.string()
         .messages({
             'string.empty': 'Country code cannot be empty.'
@@ -327,9 +324,19 @@ export const UPDATE_PROFILE_VALIDATOR = Joi.object({
         })
         .optional(),
 
-    gender: Joi.string()
-        .allow('')
-        .optional()
+    age: Joi.number()
+        .required()
+        .messages({
+            'any.required': 'Age is required.',
+            'string.empty': 'Age cannot be empty.'
+        }),
+
+    injury: Joi.string()
+        .required()
+        .messages({
+            'any.required': 'Injury is required.',
+            'string.empty': 'Injury cannot be empty.'
+        }),
 })
 
 export const ADD_FUNDS_VALIDATOR = Joi.object({
