@@ -64,7 +64,7 @@ export const sendNotification = async ({ title, message, user_ids = [], metadata
                     console.log('✅ Notification sent:', response)
 
                 } catch (err) {
-                    logger.error(`Error sending push to ${user._id}:`, err.message)
+                    logger.error(`Error sending push to ${user._id}:`, err)
                 }
             }
         }
