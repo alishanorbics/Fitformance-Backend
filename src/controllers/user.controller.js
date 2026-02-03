@@ -2,7 +2,34 @@ import logger from '../config/logger.js'
 import { compareData } from '../helpers/encryption.js'
 import { removeFiles } from '../helpers/folder.js'
 import User from '../models/user.model.js'
-import { ROLES } from '../utils/index.js'
+import Rehab from '../models/rehab.model.js'
+import { REHAB_TYPES, ROLES } from '../utils/index.js'
+
+export const getHome = async (req, res, next) => {
+
+    try {
+
+        let sort = { createdAt: - 1 }
+
+        const library = await Rehab.find({ type: { $ne: REHAB_TYPES.DOCUMENT } })
+            .sort(sort)
+
+        const protocol = await Rehab.find({ type: REHAB_TYPES.DOCUMENT })
+            .sort(sort)
+
+        logger.info(`Home listing fetched`)
+
+        return res.status(200).json({
+            success: true,
+            message: "Home listing fetched successfully.",
+            data: { progress: 0, library, protocol }
+        })
+
+    } catch (error) {
+        logger.error(`Get Users Error: ${error.message}`)
+        next(error)
+    }
+}
 
 export const getUsers = async (req, res, next) => {
 
