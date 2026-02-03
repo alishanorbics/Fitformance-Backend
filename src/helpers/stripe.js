@@ -5,6 +5,7 @@ import Transaction from '../models/transaction.model.js'
 import User from '../models/user.model.js'
 import Wallet from '../models/wallet.model.js'
 import { TRANSACTION_TYPES } from '../utils/index.js'
+import { sendNotification } from './notification.js'
 
 dotenv.config()
 
@@ -29,22 +30,14 @@ export const webhook = async (req, res) => {
 
         if (user) {
 
-            const wallet = await Wallet.findOne({ user: user._id })
-            wallet.balance += session.amount_total / 100
-            await wallet.save()
-
-            const transaction = new Transaction({
-                wallet: wallet._id,
-                type: TRANSACTION_TYPES.DEPOSIT,
-                amount: session.amount_total / 100,
-                external_reference: session.id,
-                description: `Deposit via Stripe Checkout`,
-                balance_after: wallet.balance
+            sendNotification({
+                save: false,
+                title: 'Payment Successful',
+                message: `Your payment of $${(session.amount_total / 100).toFixed(2)} was successful!`,
+                user_ids: [user._id],
+                metadata: { type: 'payment', session_id: session.id },
+                push: true
             })
-
-            await transaction.save()
-
-            logger.info(`${user.name} has desposit ${session.amount_total / 100}`)
 
         }
 
