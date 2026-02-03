@@ -43,7 +43,7 @@ export const addPackage = async (req, res, next) => {
 
 }
 
-export const subscribePackage = (async (req, res) => {
+export const subscribePackage = (async (req, res, next) => {
 
     try {
 
