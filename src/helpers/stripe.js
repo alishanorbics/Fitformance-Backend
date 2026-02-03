@@ -54,22 +54,6 @@ export const webhook = async (req, res) => {
 
 }
 
-export const connectedAccountWebhook = async (req, res) => {
-
-    let event
-
-    try {
-        const sig = req.headers["stripe-signature"]
-        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_KEY)
-    } catch (err) {
-        console.error("⚠️ Webhook signature verification failed.", err.message)
-        return res.status(400).send(`Webhook Error: ${err.message}`)
-    }
-
-    return res.json({ received: true })
-
-}
-
 export const createPackage = async ({ name, description, amount, interval = 'month', currency = 'usd' }) => {
 
     const unit_amount = Math.round(amount * 100)
@@ -99,9 +83,11 @@ export const createPackage = async ({ name, description, amount, interval = 'mon
 
 export const getAllPackages = async (filters = {}) => {
 
-    const prices = await stripe.prices.list({ limit: 100, expand: ['data.product'], ...filters })
+    let prices = await stripe.prices.list({ limit: 100, expand: ['data.product'], ...filters })
 
-    const packages = prices.data.map(price => {
+    const packages = prices.data.sort(
+        (a, b) => a.created - b.created
+    ).map(price => {
 
         const product = price.product
 
