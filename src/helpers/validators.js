@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import mongoose from 'mongoose'
-import { ENUM_ROLES } from '../utils/index.js'
+import { ENUM_REHAB_TYPES, ENUM_ROLES } from '../utils/index.js'
 
 export const SIGNUP_VALIDATOR = Joi.object({
     name: Joi.string().min(2).max(50)
@@ -29,17 +29,16 @@ export const SIGNUP_VALIDATOR = Joi.object({
         }),
 
     age: Joi.number()
-        .required()
+        .optional()
         .messages({
-            'any.required': 'Age is required.',
             'string.empty': 'Age cannot be empty.'
         }),
 
     injury: Joi.string()
         .required()
         .messages({
-            'any.required': 'Injury is required.',
-            'string.empty': 'Injury cannot be empty.'
+            'any.required': 'Functional Focus is required.',
+            'string.empty': 'Functional Focus cannot be empty.'
         }),
 
     country_code: Joi.string()
@@ -78,6 +77,9 @@ export const LOGIN_VALIDATOR = Joi.object({
         .messages({
             'any.only': `Source must be one of: ${ENUM_ROLES.join(', ')}`
         }),
+    device_id: Joi.string().optional().messages({
+        'string.base': 'Device ID must be a string',
+    }),
 })
 
 export const FORGET_PASSWORD_VALIDATOR = Joi.object({
@@ -325,17 +327,16 @@ export const UPDATE_PROFILE_VALIDATOR = Joi.object({
         .optional(),
 
     age: Joi.number()
-        .required()
+        .optional()
         .messages({
-            'any.required': 'Age is required.',
             'string.empty': 'Age cannot be empty.'
         }),
 
     injury: Joi.string()
         .required()
         .messages({
-            'any.required': 'Injury is required.',
-            'string.empty': 'Injury cannot be empty.'
+            'any.required': 'Functional Focus is required.',
+            'string.empty': 'Functional Focus cannot be empty.'
         }),
 })
 
@@ -350,28 +351,82 @@ export const ADD_FUNDS_VALIDATOR = Joi.object({
         })
 })
 
-export const CREATE_DISPUTE_VALIDATOR = Joi.object({
-    bet: Joi.string()
+export const CREATE_REHAB_VALIDATOR = Joi.object({
+    title: Joi.string().min(2).max(100)
         .required()
-        .custom((value, helpers) => {
-            if (!mongoose.Types.ObjectId.isValid(value)) {
-                return helpers.message(`Invalid Bet ID: ${value}`)
-            }
-            return value
-        })
         .messages({
-            'any.required': 'Bet ID is required.',
-            'string.empty': 'Bet ID cannot be empty.',
+            'any.required': 'Title is required.',
+            'string.empty': 'Title cannot be empty.',
+            'string.min': 'Title must be at least 2 characters long.',
+            'string.max': 'Title cannot exceed 100 characters.'
         }),
-    reason: Joi.string()
+
+    description: Joi.string()
         .trim()
         .min(5)
-        .max(500)
+        .max(1000)
         .required()
         .messages({
-            'any.required': 'Reason is required.',
-            'string.empty': 'Reason cannot be empty.',
-            'string.min': 'Reason must be at least 5 characters long.',
-            'string.max': 'Reason cannot exceed 500 characters.',
+            'any.required': 'Description is required.',
+            'string.empty': 'Description cannot be empty.',
+            'string.min': 'Description must be at least 5 characters long.',
+            'string.max': 'Description cannot exceed 1000 characters.',
         }),
+
+    type: Joi.string()
+        .valid(...ENUM_REHAB_TYPES)
+        .required()
+        .messages({
+            'any.required': 'Type is required.',
+            'string.empty': 'Type cannot be empty.',
+            'any.only': `Type must be one of: ${ENUM_REHAB_TYPES.join(', ')}`
+        }),
+
+    is_premium: Joi.boolean()
+        .optional()
+        .messages({
+            'boolean.base': 'is_premium must be a boolean value.'
+        }),
+
+})
+
+export const CREATE_PACKAGE_VALIDATOR = Joi.object({
+    name: Joi.string().min(2).max(100)
+        .required()
+        .messages({
+            'any.required': 'Name is required.',
+            'string.empty': 'Name cannot be empty.',
+            'string.min': 'Name must be at least 2 characters long.',
+            'string.max': 'Name cannot exceed 100 characters.'
+        }),
+
+    description: Joi.string()
+        .trim()
+        .min(5)
+        .max(1000)
+        .required()
+        .messages({
+            'any.required': 'Description is required.',
+            'string.empty': 'Description cannot be empty.',
+            'string.min': 'Description must be at least 5 characters long.',
+            'string.max': 'Description cannot exceed 1000 characters.',
+        }),
+
+    amount: Joi.number().positive()
+        .required()
+        .messages({
+            'any.required': 'Amount is required',
+            'number.base': 'Amount must be a number',
+            'number.positive': 'Amount must be greater than 0'
+        }),
+
+    interval: Joi.string()
+        .valid('month', 'year')
+        .required()
+        .messages({
+            'any.required': 'Interval is required.',
+            'string.empty': 'Interval cannot be empty.',
+            'any.only': 'Interval must be one of: month, year.'
+        }),
+
 })
