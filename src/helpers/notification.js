@@ -49,6 +49,9 @@ export const sendNotification = async ({ title, message, user_ids = [], metadata
             for (const token of user.device_ids) {
                 try {
 
+                    logger.info(`Sending push notification to user ${user._id} with token ${token}`)
+                    logger.info(`Notification payload: title="${title}", message="${message}", metadata=${JSON.stringify(metadata)}`)
+
                     const response = await firebase.messaging().send({
                         token,
                         notification: {
