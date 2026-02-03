@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 import { encryptData } from '../helpers/encryption.js'
-import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_GENDERS, ENUM_ROLES, REGEX, ROLES } from '../utils/index.js'
+import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_ROLES, ROLES } from '../utils/index.js'
 
 dotenv.config()
 
@@ -26,7 +26,7 @@ const user_schema = mongoose.Schema({
     },
     age: {
         type: Number,
-        required: true
+        required: false
     },
     injury: {
         type: String,
