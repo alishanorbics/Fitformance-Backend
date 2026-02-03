@@ -22,6 +22,16 @@ export const addFeedback = async (req, res, next) => {
 
         logger.info(`Feedback submitted by: ${name} (${email})`)
 
+        if (decoded?.id) {
+            await sendNotification({
+                title: 'Your Feedback Has Been Received',
+                message: `We have successfully received your feedback. Thank you for sharing your thoughts with us!`,
+                user_ids: [decoded?.id],
+                metadata: { type: 'feedback', id: feedback._id },
+                push: false
+            })
+        }
+
         await sendNotification({
             title: 'New Feedback Received',
             message: `Feedback submitted by ${name} (${email}).`,
