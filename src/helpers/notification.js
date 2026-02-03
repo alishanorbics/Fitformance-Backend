@@ -25,9 +25,11 @@ export const sendNotification = async ({ title, message, user_ids = [], metadata
         return null
     }
 
+    let notification = null
+
     if (save) {
 
-        const notification = new Notification({
+        notification = new Notification({
             title,
             message,
             recipients,
@@ -35,7 +37,7 @@ export const sendNotification = async ({ title, message, user_ids = [], metadata
         })
 
         await notification.save()
-        
+
     }
 
 
