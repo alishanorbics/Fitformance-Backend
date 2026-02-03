@@ -69,13 +69,13 @@ export const TRANSACTION_STATUS = {
 
 export const ENUM_TRANSACTION_STATUS = Object.values(TRANSACTION_STATUS)
 
-export const DISPUTE_STATUS = {
-    PENDING: 'pending',
-    REJECTED: 'rejected',
-    RESOLVED: 'resolved'
+export const REHAB_TYPES = {
+    DOCUMENT: 'document',
+    IMAGE: 'image',
+    VIDEO: 'video'
 }
 
-export const ENUM_DISPUTE_STATUS = Object.values(DISPUTE_STATUS)
+export const ENUM_REHAB_TYPES = Object.values(REHAB_TYPES)
 
 export const generateOtp = async (length = 6) => {
 
