@@ -16,6 +16,8 @@ export const getRehabs = async (req, res, next) => {
                 filter.type = { $in: [REHAB_TYPES.DOCUMENT] }
             } else if (rehab_type === 'library') {
                 filter.type = { $in: [REHAB_TYPES.VIDEO, REHAB_TYPES.IMAGE] }
+            } else if (rehab_type === 'for_you') {
+                filter.type = rehab_type
             }
         }
 
