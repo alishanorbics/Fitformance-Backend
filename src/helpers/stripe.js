@@ -35,7 +35,7 @@ export const webhook = async (req, res) => {
                 title: 'Payment Successful',
                 message: `Your payment of $${(session.amount_total / 100).toFixed(2)} was successful!`,
                 user_ids: [user._id],
-                metadata: { type: 'payment', session_id: session.id },
+                metadata: { type: 'payment' },
                 push: true
             })
 
