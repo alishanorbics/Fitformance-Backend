@@ -1,5 +1,6 @@
 import logger from "../config/logger.js"
-import { createPackage, getAllPackages, subscribe } from "../helpers/stripe.js"
+import { createPackage, getAllPackages, getUserSubscriptionLogs, subscribe } from "../helpers/stripe.js"
+import { ROLES } from "../utils/index.js"
 
 export const getPackages = async (req, res, next) => {
 
@@ -20,6 +21,33 @@ export const getPackages = async (req, res, next) => {
         next(error)
     }
 }
+
+export const getPaymentLogs = (async (req, res, next) => {
+    try {
+
+        let { id, role } = req.decoded
+
+        let payments = []
+
+        if (role === ROLES.ADMIN) {
+            payments = await getAllPackages()
+        } else {
+            payments = await getUserSubscriptionLogs(id)
+        }
+
+        logger.info(`Payment logs fetched for user ${id}`)
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment logs fetched successfully.",
+            data: payments
+        })
+
+    } catch (error) {
+        logger.error(`Get Payment Logs Error: ${error.message}`)
+        next(error)
+    }
+})
 
 export const addPackage = async (req, res, next) => {
 
