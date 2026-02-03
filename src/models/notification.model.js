@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const notification_schema = new mongoose.Schema({
     title: {
@@ -31,6 +31,6 @@ const notification_schema = new mongoose.Schema({
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-});
+})
 
-export default mongoose.model('Notification', notification_schema);
+export default mongoose.model('Notification', notification_schema)
