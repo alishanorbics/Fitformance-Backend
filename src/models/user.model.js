@@ -30,7 +30,9 @@ const user_schema = mongoose.Schema({
     },
     injury: {
         type: String,
-        required: true
+        required: function () {
+            return this.role === ROLES.USER
+        },
     },
     image: {
         type: String,
@@ -51,6 +53,10 @@ const user_schema = mongoose.Schema({
     device_ids: [{
         type: String
     }],
+    therapist: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     role: {
         type: String,
         enum: ENUM_ROLES,
