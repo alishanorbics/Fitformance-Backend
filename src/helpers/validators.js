@@ -1,8 +1,13 @@
 import Joi from 'joi'
 import mongoose from 'mongoose'
-import { ENUM_REHAB_TYPES, ENUM_ROLES } from '../utils/index.js'
+import { ENUM_REHAB_TYPES, ENUM_ROLES, ROLES } from '../utils/index.js'
 
 export const SIGNUP_VALIDATOR = Joi.object({
+
+    role: Joi.string()
+        .valid(...ENUM_ROLES)
+        .default(ROLES.USER),
+
     name: Joi.string().min(2).max(50)
         .required()
         .messages({
@@ -34,12 +39,14 @@ export const SIGNUP_VALIDATOR = Joi.object({
             'string.empty': 'Age cannot be empty.'
         }),
 
-    injury: Joi.string()
-        .required()
-        .messages({
-            'any.required': 'Functional Focus is required.',
-            'string.empty': 'Functional Focus cannot be empty.'
+    injury: Joi.string().when("role", {
+        is: ROLES.THERAPIST,
+        then: Joi.optional(),
+        otherwise: Joi.required().messages({
+            "any.required": "Functional Focus is required.",
+            "string.empty": "Functional Focus cannot be empty.",
         }),
+    }),
 
     country_code: Joi.string()
         .required()
