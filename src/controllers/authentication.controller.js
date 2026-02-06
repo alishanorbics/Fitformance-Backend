@@ -25,7 +25,8 @@ export const signup = async (req, res, next) => {
             dialing_code,
             phone,
             age,
-            injury
+            injury,
+            role
         } = body
 
         const exists_with_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 })
@@ -47,7 +48,8 @@ export const signup = async (req, res, next) => {
             dialing_code,
             phone,
             age,
-            injury
+            injury,
+            role: role || ROLES.USER,
         }
 
         if (file && file.path) {
