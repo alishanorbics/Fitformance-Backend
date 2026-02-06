@@ -1,8 +1,9 @@
 import logger from '../config/logger.js'
 import { compareData } from '../helpers/encryption.js'
 import { removeFiles } from '../helpers/folder.js'
-import User from '../models/user.model.js'
+import { buildPaginationResponse, getPagination } from '../helpers/pagination.js'
 import Rehab from '../models/rehab.model.js'
+import User from '../models/user.model.js'
 import { REHAB_TYPES, ROLES } from '../utils/index.js'
 
 export const getHome = async (req, res, next) => {
@@ -35,26 +36,35 @@ export const getUsers = async (req, res, next) => {
 
     try {
 
-        const { decoded } = req
+        const { decoded, query } = req
+        const { skip, limit, page, page_size } = getPagination(query)
 
         let filters = {}
         let sort = { createdAt: - 1 }
 
         if (decoded.role === ROLES.ADMIN) {
             filters.role = ROLES.USER
+        } else if (decoded.role === ROLES.THERAPIST) {
+            filters.therapist = decoded.id
+            filters.role = ROLES.USER
         }
 
         const users = await User.find(filters)
             .select("-password")
             .sort(sort)
+            .skip(skip)
+            .limit(limit)
             .lean({ virtuals: true })
+
+
+        const total = await User.countDocuments(filters)
 
         logger.info(`User listing fetched`)
 
         return res.status(200).json({
             success: true,
             message: "Users fetched successfully.",
-            data: users
+            ...buildPaginationResponse(users, total, page, page_size),
         })
 
     } catch (error) {
@@ -66,10 +76,17 @@ export const getUsers = async (req, res, next) => {
 export const getUserById = async (req, res, next) => {
     try {
 
-        const { params } = req
+        const { params, decoded } = req
         const { id } = params
 
-        const user = await User.findById(id).lean({ virtuals: true })
+        const user = await User.findById(id).select("-password").lean({ virtuals: true })
+
+        if ((!user) || (user && (decoded.role === ROLES.THERAPIST) && (user?.therapist?.toString() !== decoded.id.toString()))) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            })
+        }
 
         return res.status(200).json({
             success: true,
