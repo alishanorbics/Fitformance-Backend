@@ -8,7 +8,8 @@ export const REGEX = {
 
 export const ROLES = {
     ADMIN: "admin",
-    USER: "user"
+    USER: "user",
+    THERAPIST: "therapist"
 }
 
 export const ENUM_ROLES = Object.values(ROLES)
