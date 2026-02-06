@@ -27,7 +27,7 @@ export const getDashboard = async (req, res, next) => {
 export const getContent = async (req, res, next) => {
     try {
 
-        const base_url = `${req.protocol}://${req.get('host')}/uploads`
+        const base_url = `${req.protocol}s://${req.get('host')}/uploads`
 
         const files = {
             about_us: 'about-us.html',
