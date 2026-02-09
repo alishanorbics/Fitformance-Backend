@@ -4,7 +4,7 @@ import { removeFiles } from '../helpers/folder.js'
 import { buildPaginationResponse, getPagination } from '../helpers/pagination.js'
 import Rehab from '../models/rehab.model.js'
 import User from '../models/user.model.js'
-import { REHAB_TYPES, ROLES } from '../utils/index.js'
+import { REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
 
 export const getHome = async (req, res, next) => {
 
@@ -37,6 +37,7 @@ export const getUsers = async (req, res, next) => {
     try {
 
         const { decoded, query } = req
+        const { search } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filters = {}
@@ -47,6 +48,10 @@ export const getUsers = async (req, res, next) => {
         } else if (decoded.role === ROLES.THERAPIST) {
             filters.therapist = decoded.id
             filters.role = ROLES.USER
+        }
+
+        if (search) {
+            filters.name = searchRegex(search)
         }
 
         const users = await User.find(filters)

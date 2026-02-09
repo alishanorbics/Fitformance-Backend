@@ -1,12 +1,12 @@
 import logger from "../config/logger.js"
 import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Rehab from '../models/rehab.model.js'
-import { REHAB_TYPES } from "../utils/index.js"
+import { REHAB_TYPES, searchRegex } from "../utils/index.js"
 
 export const getRehabs = async (req, res, next) => {
     try {
         const { query } = req
-        const { rehab_type } = query
+        const { rehab_type, search } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {}
@@ -19,6 +19,10 @@ export const getRehabs = async (req, res, next) => {
             } else if (rehab_type === 'for_you') {
                 filter.type = rehab_type
             }
+        }
+
+        if (search) {
+            filter.title = searchRegex(search)
         }
 
         const rehabs = await Rehab.find(filter)

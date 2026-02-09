@@ -54,7 +54,7 @@ export const getReminders = (async (req, res, next) => {
     try {
 
         const { query, decoded } = req
-        const { search } = query
+        const { search, user } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {}
@@ -68,7 +68,11 @@ export const getReminders = (async (req, res, next) => {
         }
 
         if (search) {
-            filter.name = searchRegex(search)
+            filter.title = searchRegex(search)
+        }
+
+        if (user) {
+            filter.user = user
         }
 
         const reminders = await Reminder.find(filter)
