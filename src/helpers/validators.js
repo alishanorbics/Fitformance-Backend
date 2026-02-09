@@ -437,3 +437,40 @@ export const CREATE_PACKAGE_VALIDATOR = Joi.object({
         }),
 
 })
+
+export const CREATE_REMINDER_VALIDATOR = Joi.object({
+    title: Joi.string().min(2).max(100)
+        .required()
+        .messages({
+            'any.required': 'Title is required.',
+            'string.empty': 'Title cannot be empty.',
+            'string.min': 'Title must be at least 2 characters long.',
+            'string.max': 'Title cannot exceed 100 characters.'
+        }),
+
+    message: Joi.string()
+        .trim()
+        .min(5)
+        .max(1000)
+        .required()
+        .messages({
+            'any.required': 'Message is required.',
+            'string.empty': 'Message cannot be empty.',
+            'string.min': 'Message must be at least 5 characters long.',
+            'string.max': 'Message cannot exceed 1000 characters.',
+        }),
+
+    user: Joi.string()
+        .required()
+        .custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.message(`Invalid user ID: ${value}`)
+            }
+            return value
+        })
+        .messages({
+            'any.required': 'suer ID is required.',
+            'string.empty': 'suer ID cannot be empty.'
+        })
+
+})
