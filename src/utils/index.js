@@ -52,23 +52,21 @@ export const BET_PARTICIPATION_STATUS = {
 
 export const ENUM_BET_PARTICIPATION_STATUS = Object.values(BET_PARTICIPATION_STATUS)
 
-export const TRANSACTION_TYPES = {
-    DEPOSIT: 'deposit',
-    WITHDRAW: 'withdraw',
-    BET: 'bet',
-    WIN: 'win',
-    REFUND: 'refund'
+export const MESSAGE_TYPES = {
+    TEXT: 'text',
+    IMAGE: 'image',
+    VIDEO: 'video',
+    FILE: 'file'
 }
 
-export const ENUM_TRANSACTION_TYPES = Object.values(TRANSACTION_TYPES)
+export const ENUM_MESSAGE_TYPES = Object.values(MESSAGE_TYPES)
 
-export const TRANSACTION_STATUS = {
-    PENDING: 'pending',
-    COMPLETED: 'completed',
-    FAILED: 'failed'
+export const CONVERSATION_TYPES = {
+    PRIVATE: 'private',
+    GROUP: 'group'
 }
 
-export const ENUM_TRANSACTION_STATUS = Object.values(TRANSACTION_STATUS)
+export const ENUM_CONVERSATION_TYPES = Object.values(CONVERSATION_TYPES)
 
 export const REHAB_TYPES = {
     DOCUMENT: 'document',
