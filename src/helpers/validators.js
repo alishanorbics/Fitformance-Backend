@@ -474,3 +474,31 @@ export const CREATE_REMINDER_VALIDATOR = Joi.object({
         })
 
 })
+
+export const ASSIGN_THERAPIST_VALIDATOR = Joi.object({
+    therapist: Joi.string()
+        .required()
+        .custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.message(`Invalid Therapist ID: ${value}`)
+            }
+            return value
+        })
+        .messages({
+            'any.required': 'Therapist ID is required.',
+            'string.empty': 'Therapist ID cannot be empty.'
+        }),
+    user: Joi.string()
+        .required()
+        .custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.message(`Invalid user ID: ${value}`)
+            }
+            return value
+        })
+        .messages({
+            'any.required': 'User ID is required.',
+            'string.empty': 'User ID cannot be empty.'
+        })
+
+})
