@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import logger from '../config/logger.js'
+import { verifyToken } from '../helpers/token.js'
 
 dotenv.config()
 
-export const AuthVerifier = (req, res, next) => {
+export const AuthVerifier = async (req, res, next) => {
     try {
 
         const auth_header = req.headers.authorization
@@ -18,7 +19,7 @@ export const AuthVerifier = (req, res, next) => {
 
         const token = auth_header.split(' ')[1]
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
+        const decoded = await verifyToken(token)
 
         req.decoded = decoded
 
