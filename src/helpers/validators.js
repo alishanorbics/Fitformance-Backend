@@ -298,7 +298,7 @@ export const CHANGE_PASSWORD_VALIDATOR = Joi.object({
     old_password: Joi.string().min(6).required().messages({
         "any.required": "Old password is required."
     }),
-    new_password: Joi.string().min(6).required().messages({
+    password: Joi.string().min(6).required().messages({
         'string.empty': 'New password is required',
         'string.min': 'Password must be at least 6 characters long',
     })

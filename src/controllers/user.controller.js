@@ -165,7 +165,7 @@ export const changePassword = async (req, res, next) => {
     try {
 
         const { decoded, body } = req
-        const { old_password, new_password } = body
+        const { old_password, password } = body
 
         const user = await User.findById(decoded.id)
 
@@ -185,7 +185,7 @@ export const changePassword = async (req, res, next) => {
             })
         }
 
-        user.password = new_password
+        user.password = password
         await user.save()
 
         logger.info(`Password changed successfully for: ${user.email}`)
