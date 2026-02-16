@@ -75,7 +75,7 @@ export const getUsers = async (req, res, next) => {
             filters.active = active === "true"
         }
 
-        const users = User.find(filters)
+        let users = User.find(filters)
             .select("-password")
             .sort(sort)
             .skip(skip)
