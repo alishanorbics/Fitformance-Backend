@@ -1,12 +1,13 @@
 import logger from "../config/logger.js"
 import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Rehab from '../models/rehab.model.js'
-import { REHAB_TYPES, searchRegex } from "../utils/index.js"
+import { dateRangeFilter, REHAB_TYPES, searchRegex } from "../utils/index.js"
 
 export const getRehabs = async (req, res, next) => {
     try {
+
         const { query } = req
-        const { rehab_type, search } = query
+        const { rehab_type, search, from, to } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {}
@@ -23,6 +24,10 @@ export const getRehabs = async (req, res, next) => {
 
         if (search) {
             filter.title = searchRegex(search)
+        }
+
+        if ((from && from !== "") || (to && to !== "")) {
+            filter.createdAt = dateRangeFilter(from, to)
         }
 
         const rehabs = await Rehab.find(filter)

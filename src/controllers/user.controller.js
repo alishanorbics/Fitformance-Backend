@@ -6,7 +6,7 @@ import { buildPaginationResponse, getPagination } from '../helpers/pagination.js
 import Conversation from '../models/conversation.model.js'
 import Rehab from '../models/rehab.model.js'
 import User from '../models/user.model.js'
-import { CONVERSATION_TYPES, REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
+import { CONVERSATION_TYPES, dateRangeFilter, REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
 
 export const getHome = async (req, res, next) => {
 
@@ -39,14 +39,25 @@ export const getUsers = async (req, res, next) => {
     try {
 
         const { decoded, query } = req
-        const { search } = query
+        const { search, from, to, active, role } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filters = {}
         let sort = { createdAt: - 1 }
+        let populate = {}
 
         if (decoded.role === ROLES.ADMIN) {
-            filters.role = ROLES.USER
+
+            filters._id = {
+                $ne: decoded.id
+            }
+
+            if (role) {
+                filters.role = role
+            }
+
+            populate = { path: "therapist", select: "name" }
+
         } else if (decoded.role === ROLES.THERAPIST) {
             filters.therapist = decoded.id
             filters.role = ROLES.USER
@@ -56,11 +67,20 @@ export const getUsers = async (req, res, next) => {
             filters.name = searchRegex(search)
         }
 
+        if ((from && from !== "") || (to && to !== "")) {
+            filters.createdAt = dateRangeFilter(from, to)
+        }
+
+        if (Object.hasOwn(query, "active") && active !== "") {
+            filters.active = active === "true"
+        }
+
         const users = await User.find(filters)
             .select("-password")
             .sort(sort)
             .skip(skip)
             .limit(limit)
+            .populate(populate)
             .lean({ virtuals: true })
 
 
@@ -86,9 +106,9 @@ export const getUserById = async (req, res, next) => {
         const { params, decoded } = req
         const { id } = params
 
-        const user = await User.findById(id).select("-password").lean({ virtuals: true })
+        const user = await User.findById(id).select("-password").populate({ path: "therapist", select: "name email phone country_code dialing_code image" }).lean({ virtuals: true })
 
-        if ((!user) || (user && (decoded.role === ROLES.THERAPIST) && (user?.therapist?.toString() !== decoded.id.toString()))) {
+        if ((!user) || (user && (decoded.role === ROLES.THERAPIST) && (user?.therapist?._id?.toString() !== decoded.id.toString()))) {
             return res.status(404).json({
                 success: false,
                 message: "User not found.",

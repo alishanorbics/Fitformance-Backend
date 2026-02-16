@@ -3,7 +3,7 @@ import { sendNotification } from "../helpers/notification.js"
 import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Reminder from "../models/reminder.model.js"
 import User from "../models/user.model.js"
-import { ROLES, searchRegex } from "../utils/index.js"
+import { dateRangeFilter, ROLES, searchRegex } from "../utils/index.js"
 
 export const addReminder = async (req, res, next) => {
     try {
@@ -54,7 +54,7 @@ export const getReminders = (async (req, res, next) => {
     try {
 
         const { query, decoded } = req
-        const { search, user } = query
+        const { search, user, from, to } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {}
@@ -73,6 +73,10 @@ export const getReminders = (async (req, res, next) => {
 
         if (user) {
             filter.user = user
+        }
+
+        if ((from && from !== "") || (to && to !== "")) {
+            filter.createdAt = dateRangeFilter(from, to)
         }
 
         const reminders = await Reminder.find(filter)

@@ -142,3 +142,23 @@ export const formatCurrency = (amount, currency = 'USD', sign = '$') => {
     }
 
 }
+
+export const dateRangeFilter = (from, to) => {
+
+    const filter = {}
+
+    if (from) {
+        const from_date = new Date(from)
+        from_date.setHours(0, 0, 0, 0)
+        filter.$gte = from_date
+    }
+
+    if (to) {
+        const to_date = new Date(to)
+        to_date.setHours(23, 59, 59, 999)
+        filter.$lte = to_date
+    }
+
+    return filter
+
+}
