@@ -309,41 +309,36 @@ export const UPDATE_PROFILE_VALIDATOR = Joi.object({
         .min(2)
         .max(50)
         .messages({
-            'string.empty': 'Name cannot be empty.',
-            'string.min': 'Name must be at least 2 characters long.',
-            'string.max': 'Name cannot exceed 50 characters.'
+            "string.empty": "Name cannot be empty.",
+            "string.min": "Name must be at least 2 characters long.",
+            "string.max": "Name cannot exceed 50 characters.",
         })
         .optional(),
 
     country_code: Joi.string()
-        .messages({
-            'string.empty': 'Country code cannot be empty.'
-        })
+        .messages({ "string.empty": "Country code cannot be empty." })
         .optional(),
 
     dialing_code: Joi.string()
-        .messages({
-            'string.empty': 'Dialing code cannot be empty.'
-        })
+        .messages({ "string.empty": "Dialing code cannot be empty." })
         .optional(),
 
     phone: Joi.string()
-        .messages({
-            'string.empty': 'Phone number cannot be empty.'
-        })
+        .messages({ "string.empty": "Phone number cannot be empty." })
         .optional(),
 
-    age: Joi.number()
-        .optional()
-        .messages({
-            'string.empty': 'Age cannot be empty.'
-        }),
+    age: Joi.number().optional(),
+
+    role: Joi.string().default("user"),
 
     injury: Joi.string()
-        .required()
-        .messages({
-            'any.required': 'Functional Focus is required.',
-            'string.empty': 'Functional Focus cannot be empty.'
+        .when("role", {
+            is: "user",
+            then: Joi.required().messages({
+                "string.empty": "Functional Focus cannot be empty.",
+                "any.required": "Functional Focus is required for users.",
+            }),
+            otherwise: Joi.optional(),
         }),
 })
 
