@@ -75,14 +75,18 @@ export const getUsers = async (req, res, next) => {
             filters.active = active === "true"
         }
 
-        const users = await User.find(filters)
+        const users = User.find(filters)
             .select("-password")
             .sort(sort)
             .skip(skip)
             .limit(limit)
-            .populate(populate)
             .lean({ virtuals: true })
 
+        if (decoded.role === ROLES.ADMIN) {
+            users = users.populate(populate)
+        }
+
+        users = await users
 
         const total = await User.countDocuments(filters)
 
