@@ -29,13 +29,13 @@ export const GENDERS = {
 
 export const ENUM_GENDERS = Object.values(GENDERS)
 
-export const BET_STATUS = {
+export const PROFILE_STATUS = {
     PENDING: "pending",
-    RESOLVED: "resolved",
-    CANCELLED: "cancelled"
+    APPROVED: "approved",
+    REJECTED: "rejected"
 }
 
-export const ENUM_BET_STATUS = Object.values(BET_STATUS)
+export const ENUM_PROFILE_STATUS = Object.values(PROFILE_STATUS)
 
 export const BET_PROCCESS_STATUS = {
     UPCOMING: "upcoming",

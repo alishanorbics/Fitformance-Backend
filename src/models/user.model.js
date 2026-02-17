@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 import { encryptData } from '../helpers/encryption.js'
-import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_ROLES, ROLES } from '../utils/index.js'
+import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_PROFILE_STATUS, ENUM_ROLES, PROFILE_STATUS, ROLES } from '../utils/index.js'
 
 dotenv.config()
 
@@ -56,6 +56,11 @@ const user_schema = mongoose.Schema({
     therapist: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+    status: {
+        type: String,
+        enum: ENUM_PROFILE_STATUS,
+        default: PROFILE_STATUS.PENDING
     },
     role: {
         type: String,
