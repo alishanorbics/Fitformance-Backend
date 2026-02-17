@@ -99,6 +99,13 @@ export const login = async (req, res, next) => {
             })
         }
 
+        if (user.status === 'pending') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account is currently pending approval. Please wait for approval from admin.',
+            })
+        }
+
         let request_source = source || ROLES.USER
 
         if (request_source !== user.role) {
