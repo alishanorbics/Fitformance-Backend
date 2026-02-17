@@ -1,6 +1,6 @@
 import express from 'express'
-import { assignTherapist, changePassword, getHome, getMyProfile, getUserById, getUsers, removeImage, toggleStatus, updateProfile } from '../controllers/user.controller.js'
-import { ASSIGN_THERAPIST_VALIDATOR, CHANGE_PASSWORD_VALIDATOR, UPDATE_PROFILE_VALIDATOR } from '../helpers/validators.js'
+import { assignTherapist, changePassword, getHome, getMyProfile, getUserById, getUsers, removeImage, toggleStatus, updateProfile, updateStatus } from '../controllers/user.controller.js'
+import { ASSIGN_THERAPIST_VALIDATOR, CHANGE_PASSWORD_VALIDATOR, UPDATE_PROFILE_VALIDATOR, UPDATE_STATUS_VALIDATOR } from '../helpers/validators.js'
 import { AuthVerifier } from '../middleware/auth.middleware.js'
 import upload from '../middleware/upload.middleware.js'
 import validator from '../middleware/validator.js'
@@ -19,7 +19,9 @@ router.post('/change-password', AuthVerifier, validator(CHANGE_PASSWORD_VALIDATO
 
 router.patch('/update', AuthVerifier, upload('user').single('image'), validator(UPDATE_PROFILE_VALIDATOR, { optional: true }), updateProfile)
 
-router.patch('/handle-status/:id', AuthVerifier, toggleStatus)
+router.patch('/toggle-status/:id', AuthVerifier, toggleStatus)
+
+router.patch('/update-status/:id', AuthVerifier, validator(UPDATE_STATUS_VALIDATOR), updateStatus)
 
 router.post('/remove-image', AuthVerifier, removeImage)
 

@@ -322,6 +322,48 @@ export const toggleStatus = async (req, res, next) => {
 
 }
 
+export const updateStatus = async (req, res, next) => {
+    try {
+
+        const { params, body } = req
+        const { status } = body
+
+        const user = await User.findById(params.id)
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            })
+        }
+
+        if (user.status === status) {
+            return res.status(400).json({
+                success: false,
+                message: `User is already ${status}.`,
+            })
+        }
+
+        user.status = status
+        user.active = true
+
+        await user.save()
+
+        logger.info(`User status updated: ${user.email} → ${status}`)
+
+        return res.status(200).json({
+            success: true,
+            message: `User status updated to ${status} successfully.`,
+            data: user,
+        })
+
+    } catch (error) {
+        logger.error(`Update User Status Error: ${error.message}`)
+        next(error)
+    }
+}
+
+
 export const assignTherapist = async (req, res, next) => {
 
     try {
