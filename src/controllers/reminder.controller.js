@@ -34,7 +34,7 @@ export const addReminder = async (req, res, next) => {
         await sendNotification({
             title,
             message,
-            metadata: { type: 'reminder', id: reminder._id },
+            metadata: { type: 'reminder', id: reminder._id.toString() },
             user_ids: [user]
         })
 
