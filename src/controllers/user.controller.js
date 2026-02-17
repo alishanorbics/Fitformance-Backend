@@ -39,7 +39,7 @@ export const getUsers = async (req, res, next) => {
     try {
 
         const { decoded, query } = req
-        const { search, from, to, active, role } = query
+        const { search, from, to, active, role, status } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filters = {}
@@ -73,6 +73,10 @@ export const getUsers = async (req, res, next) => {
 
         if (Object.hasOwn(query, "active") && active !== "") {
             filters.active = active === "true"
+        }
+
+        if (status) {
+            filters.status = status
         }
 
         let users = User.find(filters)
