@@ -1,16 +1,20 @@
 import logger from '../config/logger.js'
 import User from '../models/user.model.js'
-import { ROLES } from '../utils/index.js'
+import { PROFILE_STATUS, ROLES } from '../utils/index.js'
 
 export const getDashboard = async (req, res, next) => {
     try {
 
-        const users = await User.countDocuments({ role: ROLES.USER })
-        const active_users = await User.countDocuments({ role: ROLES.USER, active: true })
+        const users = await User.countDocuments({ role: ROLES.USER, active: true, status: PROFILE_STATUS.APPROVED })
+        const therapists = await User.countDocuments({ role: ROLES.THERAPIST, active: true, status: PROFILE_STATUS.APPROVED })
+        const user_requests = await User.countDocuments({ role: ROLES.USER, active: true, status: PROFILE_STATUS.PENDING })
+        const therapist_requests = await User.countDocuments({ role: ROLES.THERAPIST, active: true, status: PROFILE_STATUS.PENDING })
 
         const data = {
             users,
-            active_users,
+            therapists,
+            user_requests,
+            therapist_requests
         }
 
         return res.status(200).json({
