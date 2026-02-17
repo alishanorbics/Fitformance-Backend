@@ -2,10 +2,11 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import logger from '../config/logger.js'
 import { compareData } from '../helpers/encryption.js'
+import { sendMail } from '../helpers/mail.js'
 import { generateToken, verifyToken } from '../helpers/token.js'
 import Otp from '../models/otp.model.js'
 import User from '../models/user.model.js'
-import { generateOtp, ROLES } from '../utils/index.js'
+import { generateOtp, PROFILE_STATUS, ROLES } from '../utils/index.js'
 
 dotenv.config()
 
@@ -99,10 +100,17 @@ export const login = async (req, res, next) => {
             })
         }
 
-        if (user.status === 'pending') {
+        if (user.status === PROFILE_STATUS.PENDING) {
             return res.status(403).json({
                 success: false,
                 message: 'Your account is currently pending approval. Please wait for approval from admin.',
+            })
+        }
+
+        if (user.status === PROFILE_STATUS.REJECTED) {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account has been rejected. Please contact support for more information.',
             })
         }
 
@@ -179,6 +187,18 @@ export const forgetPassword = async (req, res, next) => {
         })
 
         logger.info(`OTP generated successfully by ${user.name}`)
+
+        await sendMail({
+            to: user.email,
+            subject: "Password Reset Request – Fitformance",
+            template: "password_reset_code",
+            template_vars: {
+                name: user.name,
+                verification_code: otp,
+                app_name: "Fitformance",
+                logo_url: "https://fitformance.projectstagingzone.com/uploads/logo.png"
+            }
+        })
 
         return res.status(200).json({
             success: true,

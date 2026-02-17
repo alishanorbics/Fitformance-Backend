@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import mongoose from 'mongoose'
-import { ENUM_REHAB_TYPES, ENUM_ROLES, ROLES } from '../utils/index.js'
+import { ENUM_PROFILE_STATUS, ENUM_REHAB_TYPES, ENUM_ROLES, ROLES } from '../utils/index.js'
 
 export const SIGNUP_VALIDATOR = Joi.object({
 
@@ -342,17 +342,6 @@ export const UPDATE_PROFILE_VALIDATOR = Joi.object({
         }),
 })
 
-export const ADD_FUNDS_VALIDATOR = Joi.object({
-    amount: Joi.number()
-        .positive()
-        .required()
-        .messages({
-            'any.required': 'Amount is required',
-            'number.base': 'Amount must be a number',
-            'number.positive': 'Amount must be greater than 0'
-        })
-})
-
 export const CREATE_REHAB_VALIDATOR = Joi.object({
     title: Joi.string().min(2).max(100)
         .required()
@@ -496,4 +485,14 @@ export const ASSIGN_THERAPIST_VALIDATOR = Joi.object({
             'string.empty': 'User ID cannot be empty.'
         })
 
+})
+
+export const UPDATE_STATUS_VALIDATOR = Joi.object({
+    status: Joi.string()
+        .valid(...ENUM_PROFILE_STATUS)
+        .required()
+        .messages({
+            'any.only': `Invalid status. Allowed values: ${ENUM_PROFILE_STATUS.join(', ')}`,
+            'any.required': 'Status is required.',
+        })
 })
