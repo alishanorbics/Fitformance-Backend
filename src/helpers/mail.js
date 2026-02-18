@@ -32,8 +32,15 @@ export const sendMail = async ({
         })
 
         if (template) {
-            const template_path = path.resolve(`../../templates/${template}.ejs`)
+
+            const template_path = path.join(
+                process.cwd(),
+                "templates",
+                `${template}.ejs`
+            )
+
             html = await ejs.renderFile(template_path, template_vars)
+
         }
 
         const info = await transporter.sendMail({
