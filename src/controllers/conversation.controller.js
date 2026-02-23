@@ -52,14 +52,7 @@ export const getConversationById = async (req, res, next) => {
             participants: { $in: [decoded.id] }
         })
             .populate("participants", "name image")
-            .populate({
-                path: "last_message",
-                select: "content type createdAt sender",
-                populate: {
-                    path: "sender",
-                    select: "_id name image"
-                }
-            }).lean()
+            .lean()
 
         if (!conversation) {
             return res.status(404).json({
