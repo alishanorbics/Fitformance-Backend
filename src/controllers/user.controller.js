@@ -6,6 +6,7 @@ import { buildPaginationResponse, getPagination } from '../helpers/pagination.js
 import Conversation from '../models/conversation.model.js'
 import Rehab from '../models/rehab.model.js'
 import User from '../models/user.model.js'
+import { fetchDetails, fetchTrending, searchMulti } from '../services/tmdb.service.js'
 import { CONVERSATION_TYPES, dateRangeFilter, REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
 
 export const getHome = async (req, res, next) => {
@@ -442,4 +443,62 @@ export const assignTherapist = async (req, res, next) => {
         next(error)
     }
 
+}
+
+// new controllers
+
+export const getTrending = async (req, res, next) => {
+    try {
+
+        const trending = await fetchTrending()
+
+        return res.status(200).json({
+            success: true,
+            message: "Trending fetched successfully.",
+            data: trending
+        })
+
+    } catch (error) {
+        logger.error(`Get Trending Error: ${error.message}`)
+        next(error)
+    }
+}
+
+export const getMediaById = async (req, res, next) => {
+    try {
+
+        const { params } = req
+        const { id, media_type } = params
+
+        const media = await fetchDetails(id, media_type)
+
+        return res.status(200).json({
+            success: true,
+            message: "Media details fetched successfully.",
+            data: media
+        })
+
+    } catch (error) {
+        logger.error(`Get Media Details Error: ${error.message}`)
+        next(error)
+    }
+}
+
+export const search = async (req, res, next) => {
+    try {
+
+        const { query } = req.params
+
+        const search = await searchMulti(query)
+
+        return res.status(200).json({
+            success: true,
+            message: "Search results fetched successfully.",
+            data: search
+        })
+
+    } catch (error) {
+        logger.error(`Get Search Results Error: ${error.message}`)
+        next(error)
+    }
 }

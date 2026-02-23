@@ -22,7 +22,7 @@ const serverHandler = async () => {
         makeFolders()
         await connectDB()
         await connectSocket(io)
-
+        
     } catch (e) {
         logger.error("Error while connecting server :: ", e)
         process.exit(1)
