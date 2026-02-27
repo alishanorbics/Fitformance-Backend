@@ -1,3 +1,4 @@
+import path from 'path'
 import { encryptData } from "../helpers/encryption.js"
 
 export const DUMMY_USER_IMAGE_PATH = "uploads/user/dummy.jpg"
@@ -160,5 +161,16 @@ export const dateRangeFilter = (from, to) => {
     }
 
     return filter
+
+}
+
+export const getFileExtension = (file) => {
+
+    if (!file) return null
+
+    const ext = path.extname(file).toLowerCase()
+    if (!ext) return null
+
+    return ext.slice(1)
 
 }
