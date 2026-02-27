@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import logger from '../config/logger.js'
 import { compareData } from '../helpers/encryption.js'
 import { sendMail } from '../helpers/mail.js'
+import { sendNotification } from '../helpers/notification.js'
 import { generateToken, verifyToken } from '../helpers/token.js'
 import Otp from '../models/otp.model.js'
 import User from '../models/user.model.js'
@@ -61,6 +62,27 @@ export const signup = async (req, res, next) => {
         await user.save({ session })
 
         logger.info(`User registered successfully: ${email}`)
+
+        const title =
+            user?.role === ROLES.USER
+                ? 'New Patient Awaiting Review'
+                : 'New Therapist Awaiting Review'
+
+        const message =
+            user?.role === ROLES.USER
+                ? `A new patient, ${user.name} (${user.email}), has just registered. Please review their profile.`
+                : `A new therapist, ${user.name} (${user.email}), has just registered. Please review their profile.`
+
+        sendNotification({
+            title,
+            message,
+            metadata: {
+                id: user._id,
+                user_type: user.role,
+                type: "new_registration"
+            },
+            admin: true,
+        })
 
         await session.commitTransaction()
         session.endSession()
