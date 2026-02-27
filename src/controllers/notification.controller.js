@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import logger from "../config/logger.js"
 import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Notification from '../models/notification.model.js'
@@ -11,7 +12,7 @@ export const getNotifications = async (req, res, next) => {
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {
-            'recipients.user': decoded.id
+            'recipients.user': new mongoose.Types.ObjectId(decoded.id)
         }
 
         if (read === 'true') {
@@ -20,12 +21,49 @@ export const getNotifications = async (req, res, next) => {
             filter['recipients.read'] = false
         }
 
-        const notifications = await Notification.find(filter)
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
+        const notifications = await Notification.aggregate([
+            { $match: filter },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $addFields: {
+                    recipient: {
+                        $arrayElemAt: [
+                            {
+                                $filter: {
+                                    input: '$recipients',
+                                    as: 'self',
+                                    cond: { $eq: ['$$self.user', new mongoose.Types.ObjectId(decoded.id)] }
+                                }
+                            },
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    read: '$recipient.read'
+                }
+            },
+            { $project: { recipient: 0 } }
+        ])
 
         const total = await Notification.countDocuments(filter)
+
+        await Notification.updateMany(
+            { _id: { $in: notifications.map(item => item._id) }, 'recipients.user': new mongoose.Types.ObjectId(decoded.id) },
+            {
+                $set: {
+                    'recipients.$[elem].read': true,
+                    'recipients.$[elem].read_at': new Date()
+                }
+            },
+            {
+                arrayFilters: [{ 'elem.user': new mongoose.Types.ObjectId(decoded.id) }]
+            }
+        )
 
         logger.info(`Notifications listing fetched for user ${decoded.id}`)
 
