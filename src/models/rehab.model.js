@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
-import { ENUM_REHAB_TYPES, REHAB_TYPES } from '../utils/index.js'
+import { ENUM_REHAB_TYPES, getFileExtension, REHAB_TYPES } from '../utils/index.js'
 
 dotenv.config()
 
@@ -60,6 +60,18 @@ rehab_schema.virtual('rehab_type').get(function () {
     }
 
     return `${process.env.BASE_URL}${this.file}`
+
+})
+
+rehab_schema.virtual('file_type').get(function () {
+
+    if (!this.file) {
+        return null
+    }
+
+    const file_extension = getFileExtension(this.file)
+
+    return file_extension
 
 })
 
