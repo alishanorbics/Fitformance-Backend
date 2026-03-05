@@ -63,13 +63,11 @@ export const fetchDetails = async (id, media_type) => {
         throw new Error("id and media_type are required")
     }
 
-    const [data, videos] = await Promise.all([
+    const [data, videos, providers] = await Promise.all([
         api.get(`/${media_type}/${id}`),
-        api.get(`/${media_type}/${id}/videos`)
+        api.get(`/${media_type}/${id}/videos`),
+        api.get(`/${media_type}/${id}/watch/providers`)
     ])
-
-    console.log("Videos", videos?.data);
-    
 
     const trailer =
         videos?.data?.results?.find(
@@ -84,12 +82,27 @@ export const fetchDetails = async (id, media_type) => {
                 video.type === "Trailer"
         )
 
+    const us_providers = providers?.data?.results?.US || {}
+
+    const all_providers = [
+        ...(us_providers?.flatrate || []),
+        ...(us_providers?.rent || []),
+        ...(us_providers?.buy || [])
+    ]
+
+    const unique_providers = Array.from(
+        new Map(all_providers.map(p => [p.provider_id, p])).values()
+    ).sort((a, b) => a.display_priority - b.display_priority).map(p => ({
+        ...p,
+        logo_url: getImageUrl(p.logo_path, "w200")
+    }))
+
     return {
         id: data?.data?.id,
         media_type,
         title: data?.data?.title || data?.data?.name,
         overview: data?.data?.overview,
-        poster: getImageUrl(data?.data?.poster_path),
+        poster: getImageUrl(data?.data?.poster_path, "w500"),
         backdrop: getImageUrl(data?.data?.backdrop_path, "w780"),
         release_date: (data?.data?.release_date || data?.data?.first_air_date || "").split("-")[0],
         rating_percentage: `${Math.ceil(data?.data?.vote_average * 10)}%`,
@@ -97,10 +110,13 @@ export const fetchDetails = async (id, media_type) => {
         runtime:
             data?.data?.runtime || data?.data?.episode_run_time?.[0] || null,
         number_of_seasons: data?.data?.number_of_seasons || null,
+
         trailer_key: trailer?.key || null,
         trailer_url: trailer
             ? `https://www.youtube.com/watch?v=${trailer.key}`
             : null,
+        tmdb_watch_link: us_providers?.link || null,
+        providers: unique_providers
     }
 }
 
