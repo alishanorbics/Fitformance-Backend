@@ -82,7 +82,7 @@ export const fetchDetails = async (id, media_type) => {
                 video.type === "Trailer"
         )
 
-    console.log("providers", providers?.data?.results?.US)
+    console.log("providers", providers?.data?.results)
 
     const us_providers = providers?.data?.results?.US || {}
 
