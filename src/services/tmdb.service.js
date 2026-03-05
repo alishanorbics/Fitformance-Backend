@@ -82,6 +82,8 @@ export const fetchDetails = async (id, media_type) => {
                 video.type === "Trailer"
         )
 
+    console.log("providers", providers)
+
     const us_providers = providers?.data?.results?.US || {}
 
     const all_providers = [
