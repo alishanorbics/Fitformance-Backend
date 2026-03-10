@@ -379,6 +379,11 @@
   dependencies:
     "@types/webidl-conversions" "*"
 
+"@watchmode/api-client@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@watchmode/api-client/-/api-client-1.0.0.tgz#a56344ce6fd02cf73bee37233f02c1b9b5e5e387"
+  integrity sha512-SCUq+W2/Vcv1W9TP/Teg+RbKt1hc0KMx+fashL2nQK+5dqCcOW+Q26ULR2RmBJJ7ORLwwdu7HXkrYSchuKB72w==
+
 abort-controller@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/abort-controller/-/abort-controller-3.0.0.tgz#eaf54d53b62bae4138e809ca225c8439a6efb392"
