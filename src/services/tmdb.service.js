@@ -1,4 +1,9 @@
 import api from "../config/api.js"
+import { WatchmodeClient } from '@watchmode/api-client';
+
+const client = new WatchmodeClient({
+    apiKey: "MKQPavNHsF71psVbyivpHx4tonyXPSVXznuchhSy"
+});
 
 export const searchMovies = async (query, page = 1) => {
     const { data } = await api.get("/search/movie", {
@@ -57,40 +62,15 @@ export const fetchTrending = async (type = "all", time = "week") => {
 
 }
 
-const PLATFORM_SEARCH = {
-    Netflix: (title) =>
-        `https://www.netflix.com/search?q=${encodeURIComponent(title)}`,
-
-    "Amazon Prime Video": (title) =>
-        `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodeURIComponent(title)}`,
-
-    "Disney Plus": (title) =>
-        `https://www.disneyplus.com/search?q=${encodeURIComponent(title)}`,
-
-    "Apple TV Plus": (title) =>
-        `https://tv.apple.com/search?term=${encodeURIComponent(title)}`,
-
-    Hulu: (title) =>
-        `https://www.hulu.com/search?q=${encodeURIComponent(title)}`,
-}
-
-export const getProviderSearchLink = (providerName, title) => {
-    const fn = PLATFORM_SEARCH[providerName];
-    if (!fn) return null;
-    return fn(title);
-}
-
 export const fetchDetails = async (id, media_type) => {
-
     if (!id || !media_type) {
         throw new Error("id and media_type are required")
     }
 
-    const [data, videos, providers] = await Promise.all([
+    const [data, videos] = await Promise.all([
         api.get(`/${media_type}/${id}`),
-        api.get(`/${media_type}/${id}/videos`),
-        api.get(`/${media_type}/${id}/watch/providers`)
-    ])
+        api.get(`/${media_type}/${id}/videos`)
+    ]);
 
     const trailer =
         videos?.data?.results?.find(
@@ -103,30 +83,38 @@ export const fetchDetails = async (id, media_type) => {
             (video) =>
                 video.site === "YouTube" &&
                 video.type === "Trailer"
-        )
+        );
 
-    console.log("providers", providers?.data?.results)
+    const { data: checking } = await client.title.getDetails(`${media_type}-${id}`);
 
-    const us_providers = providers?.data?.results?.US || {}
+    const { data: sources } = await client.title.getSources(checking?.id, {
+        regions: "US"
+    });
 
-    const all_providers = [
-        ...(us_providers?.flatrate || []),
-        ...(us_providers?.rent || []),
-        ...(us_providers?.buy || [])
-    ]
+    const { data: all_sources } = await client.sources.list();
+    const logo = Object.fromEntries(all_sources.map((s) => [s.id, s.logo_100px]));
 
-    const unique_providers = Array.from(
-        new Map(all_providers.map((p) => [p.provider_id, p])).values()
+    const watchmode_providers = Array.from(
+        new Map(
+            sources?.map((p) => [
+                p.source_id,
+                {
+                    source_id: p.source_id,
+                    name: p.name,
+                    type: p.type,
+                    region: p.region,
+                    ios_url: p.ios_url,
+                    android_url: p.android_url,
+                    web_url: p.web_url,
+                    formats: [p.format],
+                    price: p.price,
+                    seasons: p.seasons,
+                    episodes: p.episodes,
+                    logo_url: logo[p.source_id] || null
+                }
+            ]) || []
+        ).values()
     )
-        .sort((a, b) => a.display_priority - b.display_priority)
-        .map((p) => ({
-            ...p,
-            logo_url: getImageUrl(p.logo_path, "w200"),
-            search_url: getProviderSearchLink(
-                p.provider_name,
-                data?.data?.title || data?.data?.name
-            ),
-        }))
 
     return {
         id: data?.data?.id,
@@ -138,17 +126,12 @@ export const fetchDetails = async (id, media_type) => {
         release_date: (data?.data?.release_date || data?.data?.first_air_date || "").split("-")[0],
         rating_percentage: `${Math.ceil(data?.data?.vote_average * 10)}%`,
         genres: data?.data?.genres?.map((g) => g.name) || [],
-        runtime:
-            data?.data?.runtime || data?.data?.episode_run_time?.[0] || null,
+        runtime: data?.data?.runtime || data?.data?.episode_run_time?.[0] || null,
         number_of_seasons: data?.data?.number_of_seasons || null,
-
         trailer_key: trailer?.key || null,
-        trailer_url: trailer
-            ? `https://www.youtube.com/watch?v=${trailer.key}`
-            : null,
-        tmdb_watch_link: us_providers?.link || null,
-        providers: unique_providers
-    }
+        trailer_url: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null,
+        providers: watchmode_providers
+    };
 }
 
 export const getImageUrl = (path, size = "w500") => {
