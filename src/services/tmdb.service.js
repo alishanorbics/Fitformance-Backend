@@ -57,6 +57,29 @@ export const fetchTrending = async (type = "all", time = "week") => {
 
 }
 
+const PLATFORM_SEARCH = {
+    Netflix: (title) =>
+        `https://www.netflix.com/search?q=${encodeURIComponent(title)}`,
+
+    "Amazon Prime Video": (title) =>
+        `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodeURIComponent(title)}`,
+
+    "Disney Plus": (title) =>
+        `https://www.disneyplus.com/search?q=${encodeURIComponent(title)}`,
+
+    "Apple TV Plus": (title) =>
+        `https://tv.apple.com/search?term=${encodeURIComponent(title)}`,
+
+    Hulu: (title) =>
+        `https://www.hulu.com/search?q=${encodeURIComponent(title)}`,
+}
+
+export const getProviderSearchLink = (providerName, title) => {
+    const fn = PLATFORM_SEARCH[providerName];
+    if (!fn) return null;
+    return fn(title);
+}
+
 export const fetchDetails = async (id, media_type) => {
 
     if (!id || !media_type) {
@@ -93,11 +116,17 @@ export const fetchDetails = async (id, media_type) => {
     ]
 
     const unique_providers = Array.from(
-        new Map(all_providers.map(p => [p.provider_id, p])).values()
-    ).sort((a, b) => a.display_priority - b.display_priority).map(p => ({
-        ...p,
-        logo_url: getImageUrl(p.logo_path, "w200")
-    }))
+        new Map(all_providers.map((p) => [p.provider_id, p])).values()
+    )
+        .sort((a, b) => a.display_priority - b.display_priority)
+        .map((p) => ({
+            ...p,
+            logo_url: getImageUrl(p.logo_path, "w200"),
+            search_url: getProviderSearchLink(
+                p.provider_name,
+                data?.data?.title || data?.data?.name
+            ),
+        }))
 
     return {
         id: data?.data?.id,
