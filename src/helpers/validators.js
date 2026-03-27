@@ -381,6 +381,105 @@ export const CREATE_REHAB_VALIDATOR = Joi.object({
 
 })
 
+export const CREATE_PLAN_VALIDATOR = Joi.object({
+    exercises: Joi.array()
+        .items(
+            Joi.object({
+                name: Joi.string()
+                    .min(2)
+                    .max(100)
+                    .required()
+                    .messages({
+                        'any.required': 'Exercise name is required.',
+                        'string.empty': 'Exercise name cannot be empty.',
+                        'string.min': 'Exercise name must be at least 2 characters long.',
+                        'string.max': 'Exercise name cannot exceed 100 characters.'
+                    }),
+
+                notes: Joi.string()
+                    .trim()
+                    .min(5)
+                    .max(1000)
+                    .required()
+                    .messages({
+                        'any.required': 'Notes are required.',
+                        'string.empty': 'Notes cannot be empty.',
+                        'string.min': 'Notes must be at least 5 characters long.',
+                        'string.max': 'Notes cannot exceed 1000 characters.'
+                    }),
+
+                frequency: Joi.number()
+                    .integer()
+                    .min(1)
+                    .required()
+                    .messages({
+                        'any.required': 'Frequency is required.',
+                        'number.base': 'Frequency must be a number.',
+                        'number.integer': 'Frequency must be an integer.',
+                        'number.min': 'Frequency must be at least 1.'
+                    }),
+            })
+        )
+        .min(1)
+        .required()
+        .messages({
+            'array.base': 'Exercises must be an array.',
+            'array.min': 'At least one exercise is required.',
+            'any.required': 'Exercises are required.'
+        }),
+
+    user: Joi.string()
+        .required()
+        .custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.message(`Invalid User ID: ${value}`)
+            }
+            return value
+        })
+        .messages({
+            'any.required': 'User ID is required.',
+            'string.empty': 'User ID cannot be empty.'
+        }),
+
+    protocol: Joi.array()
+        .items(
+            Joi.string()
+                .custom((value, helpers) => {
+                    if (!mongoose.Types.ObjectId.isValid(value)) {
+                        return helpers.error('any.invalid')
+                    }
+                    return value
+                })
+                .messages({ 'any.invalid': 'Invalid protocol ID' })
+        )
+        .min(1)
+        .required()
+        .messages({
+            'array.base': 'Protocols must be an array.',
+            'array.min': 'At least one protocol is required.',
+            'any.required': 'Protocols are required.'
+        }),
+
+    library: Joi.array()
+        .items(
+            Joi.string()
+                .custom((value, helpers) => {
+                    if (!mongoose.Types.ObjectId.isValid(value)) {
+                        return helpers.error('any.invalid')
+                    }
+                    return value
+                })
+                .messages({ 'any.invalid': 'Invalid library ID' })
+        )
+        .min(1)
+        .required()
+        .messages({
+            'array.base': 'Library must be an array.',
+            'array.min': 'At least one library item is required.',
+            'any.required': 'Library is required.'
+        }),
+})
+
 export const CREATE_PACKAGE_VALIDATOR = Joi.object({
     name: Joi.string().min(2).max(100)
         .required()
@@ -418,6 +517,47 @@ export const CREATE_PACKAGE_VALIDATOR = Joi.object({
             'any.required': 'Interval is required.',
             'string.empty': 'Interval cannot be empty.',
             'any.only': 'Interval must be one of: month, year.'
+        }),
+    protocols: Joi.array()
+        .items(
+            Joi.string()
+                .custom((value, helpers) => {
+                    if (!mongoose.Types.ObjectId.isValid(value)) {
+                        return helpers.error('any.invalid')
+                    }
+                    return value
+                })
+                .messages({
+                    'any.invalid': 'Invalid protocol ID'
+                })
+        )
+        .min(1)
+        .required()
+        .messages({
+            'array.base': 'Protocols must be an array.',
+            'array.min': 'At least one protocol is required.',
+            'any.required': 'Protocols are required.'
+        }),
+
+    library: Joi.array()
+        .items(
+            Joi.string()
+                .custom((value, helpers) => {
+                    if (!mongoose.Types.ObjectId.isValid(value)) {
+                        return helpers.error('any.invalid')
+                    }
+                    return value
+                })
+                .messages({
+                    'any.invalid': 'Invalid library ID'
+                })
+        )
+        .min(1)
+        .required()
+        .messages({
+            'array.base': 'Library must be an array.',
+            'array.min': 'At least one library item is required.',
+            'any.required': 'Library is required.'
         }),
 
 })
