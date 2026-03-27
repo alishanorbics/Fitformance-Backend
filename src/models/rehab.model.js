@@ -1,5 +1,6 @@
-import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import mongoose from 'mongoose'
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 import { ENUM_REHAB_TYPES, getFileExtension, REHAB_TYPES } from '../utils/index.js'
 
 dotenv.config()
@@ -74,5 +75,7 @@ rehab_schema.virtual('file_type').get(function () {
     return file_extension
 
 })
+
+rehab_schema.plugin(mongooseLeanVirtuals)
 
 export default mongoose.model('Rehab', rehab_schema)
