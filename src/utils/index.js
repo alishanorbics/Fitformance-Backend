@@ -46,12 +46,12 @@ export const BET_PROCCESS_STATUS = {
 
 export const ENUM_BET_PROCCESS_STATUS = Object.values(BET_PROCCESS_STATUS)
 
-export const BET_PARTICIPATION_STATUS = {
-    CONFIRMED: "confirmed",
-    NOT_CONFIRMED: "not_confirmed"
+export const PLAN_STATUS = {
+    PENDING: "pending",
+    COMPLETED: "completed"
 }
 
-export const ENUM_BET_PARTICIPATION_STATUS = Object.values(BET_PARTICIPATION_STATUS)
+export const ENUM_PLAN_STATUS = Object.values(PLAN_STATUS)
 
 export const MESSAGE_TYPES = {
     TEXT: 'text',
