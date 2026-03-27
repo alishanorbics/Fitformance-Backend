@@ -4,10 +4,12 @@ import { removeFiles } from '../helpers/folder.js'
 import { sendNotification } from '../helpers/notification.js'
 import { buildPaginationResponse, getPagination } from '../helpers/pagination.js'
 import Conversation from '../models/conversation.model.js'
+import Plan from '../models/plan.model.js'
 import Rehab from '../models/rehab.model.js'
+import RehabAssignment from '../models/rehabassignment.model.js'
 import User from '../models/user.model.js'
 import { fetchDetails, fetchTrending, searchMulti } from '../services/tmdb.service.js'
-import { CONVERSATION_TYPES, dateRangeFilter, REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
+import { CONVERSATION_TYPES, dateRangeFilter, PLAN_STATUS, REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
 
 export const getHome = async (req, res, next) => {
 
@@ -124,10 +126,45 @@ export const getUserById = async (req, res, next) => {
             })
         }
 
+        let payload = { ...user }
+
+        if (decoded.role === ROLES.THERAPIST) {
+
+            const plans = await Plan.find({ therapist: user.therapist._id, user: user._id }).lean({ virtuals: true })
+            const rehab_assignment = await RehabAssignment.find({ therapist: user.therapist._id, user: user._id }).populate({ path: "rehab", options: { lean: { virtuals: true } } }).lean({ virtuals: true })
+
+            const protocols = []
+            const library = []
+
+            rehab_assignment.forEach((assignment) => {
+
+                if (!assignment.rehab) return
+
+                if (assignment.rehab.type === REHAB_TYPES.DOCUMENT) {
+                    protocols.push(assignment)
+                } else if ([REHAB_TYPES.VIDEO, REHAB_TYPES.IMAGE].includes(assignment.rehab.type)) {
+                    library.push(assignment)
+                }
+
+            })
+
+            const completed_exercises = plans.filter(plan => plan?.status === PLAN_STATUS.COMPLETED).length
+
+            const progress = plans.length > 0
+                ? Math.round((completed_exercises / plans.length) * 100)
+                : 0
+
+            payload.plans = plans
+            payload.protocols = protocols
+            payload.library = library
+            payload.progress = progress
+
+        }
+
         return res.status(200).json({
             success: true,
             message: 'User fetched successfully.',
-            data: user
+            data: payload
         })
 
     } catch (error) {
