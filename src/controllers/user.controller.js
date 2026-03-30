@@ -5,7 +5,6 @@ import { sendNotification } from '../helpers/notification.js'
 import { buildPaginationResponse, getPagination } from '../helpers/pagination.js'
 import Conversation from '../models/conversation.model.js'
 import Plan from '../models/plan.model.js'
-import Rehab from '../models/rehab.model.js'
 import RehabAssignment from '../models/rehabassignment.model.js'
 import User from '../models/user.model.js'
 import { fetchDetails, fetchTrending, searchMulti } from '../services/tmdb.service.js'
@@ -15,20 +14,38 @@ export const getHome = async (req, res, next) => {
 
     try {
 
-        let sort = { createdAt: - 1 }
+        const { decoded } = req
 
-        const library = await Rehab.find({ type: { $ne: REHAB_TYPES.DOCUMENT } })
-            .sort(sort)
+        const rehab_assignment = await RehabAssignment.find({ user: decoded.id }).populate({ path: "rehab", options: { lean: { virtuals: true } } }).lean({ virtuals: true })
+        const plans = await Plan.find({ user: decoded.id }).lean({ virtuals: true })
 
-        const protocol = await Rehab.find({ type: REHAB_TYPES.DOCUMENT })
-            .sort(sort)
+        const protocols = []
+        const library = []
+
+        rehab_assignment.forEach((assignment) => {
+
+            if (!assignment.rehab) return
+
+            if (assignment.rehab.type === REHAB_TYPES.DOCUMENT) {
+                protocols.push(assignment.rehab)
+            } else if ([REHAB_TYPES.VIDEO, REHAB_TYPES.IMAGE].includes(assignment.rehab.type)) {
+                library.push(assignment.rehab)
+            }
+
+        })
+
+        const completed_exercises = plans.filter(plan => plan?.status === PLAN_STATUS.COMPLETED).length
+
+        const progress = plans.length > 0
+            ? Math.round((completed_exercises / plans.length) * 100)
+            : 0
 
         logger.info(`Home listing fetched`)
 
         return res.status(200).json({
             success: true,
             message: "Home listing fetched successfully.",
-            data: { progress: 0, library, protocol }
+            data: { progress, library, protocols }
         })
 
     } catch (error) {
