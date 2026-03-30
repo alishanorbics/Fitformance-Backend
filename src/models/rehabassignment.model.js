@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 
 dotenv.config()
 
@@ -25,5 +26,7 @@ const rehab_assignment_schema = new mongoose.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
 })
+
+rehab_assignment_schema.plugin(mongooseLeanVirtuals)
 
 export default mongoose.model('RehabAssignment', rehab_assignment_schema)
