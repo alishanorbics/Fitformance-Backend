@@ -80,3 +80,37 @@ export const OptionalAuthVerifier = (req, res, next) => {
 
     }
 }
+
+export const RoleGuard = (...roles) => {
+
+    return (req, res, next) => {
+
+        try {
+
+            const decoded = req.decoded
+
+            if (!decoded) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Unauthorized. No decoded token found.',
+                })
+            }
+
+            if (!roles.includes(decoded.role)) {
+                return res.status(403).json({
+                    success: false,
+                    message: `Access denied. Required roles: ${roles.join(', ')}`,
+                })
+            }
+
+            next()
+
+        } catch (error) {
+            logger.error('RoleGuard middleware error:', error)
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error during role verification.',
+            })
+        }
+    }
+}
