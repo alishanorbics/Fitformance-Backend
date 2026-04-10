@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 import { encryptData } from '../helpers/encryption.js'
-import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_PROFILE_STATUS, ENUM_ROLES, PROFILE_STATUS, ROLES } from '../utils/index.js'
+import { AUTH_TYPES, DUMMY_USER_IMAGE_PATH, ENUM_AUTH_TYPES, ENUM_PROFILE_STATUS, ENUM_ROLES, getFileExtension, PROFILE_STATUS, ROLES } from '../utils/index.js'
 
 dotenv.config()
 
@@ -141,7 +141,7 @@ user_schema.virtual('documents_detail').get(function () {
         if (!doc) return null
 
         const filename = doc.split('/').pop()
-        const ext = filename.includes('.') ? filename.split('.').pop().toLowerCase() : null
+        const ext = getFileExtension(doc)
         const url = doc.startsWith('http') ? doc : `${process.env.BASE_URL}${doc}`
         const path = doc
 
