@@ -57,6 +57,9 @@ const user_schema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    documents: [{
+        type: String
+    }],
     status: {
         type: String,
         enum: ENUM_PROFILE_STATUS,
@@ -124,6 +127,27 @@ user_schema.virtual('image_url').get(function () {
     }
 
     return `${process.env.BASE_URL}${this.image}`
+
+})
+
+user_schema.virtual('documents_detail').get(function () {
+
+    if (!this.documents || !this.documents.length) {
+        return []
+    }
+
+    return this.documents.map((doc) => {
+
+        if (!doc) return null
+
+        const filename = doc.split('/').pop()
+        const ext = filename.includes('.') ? filename.split('.').pop().toLowerCase() : null
+        const url = doc.startsWith('http') ? doc : `${process.env.BASE_URL}${doc}`
+        const path = doc
+
+        return { filename, ext, url, path }
+
+    }).filter(Boolean)
 
 })
 

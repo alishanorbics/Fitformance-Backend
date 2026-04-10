@@ -418,7 +418,6 @@ export const updateStatus = async (req, res, next) => {
     }
 }
 
-
 export const assignTherapist = async (req, res, next) => {
 
     try {
@@ -494,6 +493,129 @@ export const assignTherapist = async (req, res, next) => {
 
     } catch (error) {
         logger.error(`Assign Therapist Error: ${error.message}`)
+        next(error)
+    }
+
+}
+
+export const assignDocuments = async (req, res, next) => {
+
+    try {
+
+        const { body, decoded, files } = req
+
+        let therapist = await User.findOne({ _id: decoded.id, role: ROLES.THERAPIST })
+
+        if (!therapist) {
+            return res.status(404).json({
+                success: false,
+                message: 'Therapist not found.',
+            })
+        }
+
+        let user = await User.findOne({ _id: body?.user, therapist: decoded.id, role: ROLES.USER })
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            })
+        }
+
+        const existing_count = user.documents?.length || 0
+        const incoming_count = files?.length || 0
+
+        if (existing_count >= 3) {
+            return res.status(400).json({
+                success: false,
+                message: 'Document limit reached. Maximum 3 documents allowed per user.',
+            })
+        }
+
+        if (existing_count + incoming_count > 3) {
+            return res.status(400).json({
+                success: false,
+                message: `Only ${3 - existing_count} document slot(s) remaining.`,
+            })
+        }
+
+        const new_paths = files?.map(item => item.path) || []
+        user.documents = [...(user.documents || []), ...new_paths]
+        await user.save()
+
+        logger.info(`Documents assigned successfully | User: ${user.email} | Therapist: ${therapist.email}`)
+
+        return res.status(200).json({
+            success: true,
+            message: "Documents assigned to user successfully.",
+        })
+
+    } catch (error) {
+        logger.error(`Assign Documents Error: ${error.message}`)
+        next(error)
+    }
+
+}
+
+export const deleteAssignedDocument = async (req, res, next) => {
+
+    try {
+
+        const { body, decoded } = req
+        let { path, user } = body
+
+        let therapist = await User.findOne({ _id: decoded.id, role: ROLES.THERAPIST })
+
+        if (!therapist) {
+            return res.status(404).json({
+                success: false,
+                message: 'Therapist not found.',
+            })
+        }
+
+        user = await User.findOne({ _id: user, therapist: decoded.id, role: ROLES.USER })
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            })
+        }
+
+        if (!path) {
+            return res.status(400).json({
+                success: false,
+                message: 'Document URL is required.',
+            })
+        }
+
+        console.log(user.documents);
+        console.log(path);
+
+
+        const exists = user.documents?.some(item => item === path)
+
+        if (!exists) {
+            return res.status(404).json({
+                success: false,
+                message: 'Document not found.',
+            })
+        }
+
+        user.documents = user.documents.filter(item => item !== path)
+        await user.save()
+
+        removeFiles(path)
+
+        logger.info(`Document deleted successfully | User: ${user.email} | Therapist: ${therapist.email}`)
+
+        return res.status(200).json({
+            success: true,
+            message: "Document deleted successfully.",
+        })
+
+    } catch (error) {
+        logger.error(`Delete Document Error: ${error.message}`)
         next(error)
     }
 
