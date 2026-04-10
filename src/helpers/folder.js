@@ -4,7 +4,7 @@ import path from 'path'
 export const makeFolders = () => {
 
     const base_path = path.resolve('uploads')
-    const sub_folders = ['user', 'rehab']
+    const sub_folders = ['user', 'rehab', 'user_documents']
 
     if (!fs.existsSync(base_path)) {
         fs.mkdirSync(base_path, { recursive: true })
