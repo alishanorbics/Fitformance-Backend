@@ -76,7 +76,7 @@ export const getRehabById = async (req, res, next) => {
 export const getRehabAssignments = async (req, res, next) => {
     try {
         const { query, decoded } = req
-        const { from, to, rehab_type } = query
+        const { search, from, to, rehab_type } = query
         const { skip, limit, page, page_size } = getPagination(query)
 
         let filter = {}
@@ -113,6 +113,11 @@ export const getRehabAssignments = async (req, res, next) => {
             { $unwind: "$rehab" },
 
             ...(rehab_type ? [{ $match: { "rehab.type": rehab_match.type } }] : []),
+
+            ...(search && search.trim() !== ""
+                ? [{ $match: { "rehab.title": searchRegex(search) } }]
+                : []
+            ),
 
             { $sort: { createdAt: -1 } },
 
