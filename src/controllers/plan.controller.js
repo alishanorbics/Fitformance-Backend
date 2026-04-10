@@ -4,6 +4,7 @@ import { buildPaginationResponse, getPagination } from "../helpers/pagination.js
 import Plan from "../models/plan.model.js"
 import RehabAssignment from "../models/rehabassignment.model.js"
 import User from "../models/user.model.js"
+import { calculateProgress } from "../services/excercise.service.js"
 import { dateRangeFilter, PLAN_STATUS, ROLES, searchRegex } from "../utils/index.js"
 
 export const getPlans = async (req, res, next) => {
@@ -153,7 +154,7 @@ export const addPlan = async (req, res, next) => {
 
 export const completePlan = async (req, res, next) => {
     try {
-        
+
         const { params, decoded } = req
         const { id } = params
 
@@ -174,10 +175,14 @@ export const completePlan = async (req, res, next) => {
         plan.status = PLAN_STATUS.COMPLETED
         await plan.save()
 
+        const progress = await calculateProgress(decoded.id)
+
         return res.status(200).json({
             success: true,
             message: "Exercise marked as complete",
-            data: plan
+            data: {
+                progress
+            }
         })
 
     } catch (error) {

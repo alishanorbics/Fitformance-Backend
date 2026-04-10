@@ -7,6 +7,7 @@ import Conversation from '../models/conversation.model.js'
 import Plan from '../models/plan.model.js'
 import RehabAssignment from '../models/rehabassignment.model.js'
 import User from '../models/user.model.js'
+import { calculateProgress } from '../services/excercise.service.js'
 import { fetchDetails, fetchTrending, searchMulti } from '../services/tmdb.service.js'
 import { CONVERSATION_TYPES, dateRangeFilter, PLAN_STATUS, REHAB_TYPES, ROLES, searchRegex } from '../utils/index.js'
 
@@ -34,11 +35,7 @@ export const getHome = async (req, res, next) => {
 
         })
 
-        const completed_exercises = plans.filter(plan => plan?.status === PLAN_STATUS.COMPLETED).length
-
-        const progress = plans.length > 0
-            ? Math.round((completed_exercises / plans.length) * 100)
-            : 0
+        const progress = await calculateProgress(decoded.id)
 
         logger.info(`Home listing fetched`)
 
