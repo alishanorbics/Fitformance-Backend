@@ -1,8 +1,8 @@
 import Plan from "../models/plan.model.js"
 
-export const calculateProgress = async () => {
+export const calculateProgress = async (user) => {
 
-    const plans = await Plan.find({ user: decoded.id }).lean({ virtuals: true }).select("status")
+    const plans = await Plan.find({ user }).lean({ virtuals: true }).select("status")
 
     const completed_exercises = plans.filter(plan => plan?.status === PLAN_STATUS.COMPLETED).length
 
