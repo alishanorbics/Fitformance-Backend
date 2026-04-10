@@ -1,4 +1,4 @@
-import Plan from "../models/plan.model"
+import Plan from "../models/plan.model.js"
 
 export const calculateProgress = async () => {
 
