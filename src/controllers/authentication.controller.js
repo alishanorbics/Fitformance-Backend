@@ -224,7 +224,7 @@ export const forgetPassword = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: `OTP has been sent to email. ${otp} (For testing purposes, OTP is included in the response)`,
+            message: `OTP has been sent to email.`,
             data: {
                 email
             },
