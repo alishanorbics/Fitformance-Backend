@@ -542,6 +542,16 @@ export const assignDocuments = async (req, res, next) => {
 
         logger.info(`Documents assigned successfully | User: ${user.email} | Therapist: ${therapist.email}`)
 
+        await sendNotification({
+            title: "You’ve Got New Documents 📄",
+            message: "Your therapist just shared some documents with you. Please review them.",
+            user_ids: [user._id],
+            metadata: {
+                type: "document_assignment",
+                id: user._id.toString()
+            }
+        })
+
         return res.status(200).json({
             success: true,
             message: "Documents assigned to user successfully.",
