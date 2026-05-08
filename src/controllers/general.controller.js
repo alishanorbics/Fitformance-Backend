@@ -1,6 +1,6 @@
 import logger from '../config/logger.js'
 import User from '../models/user.model.js'
-import { PROFILE_STATUS, ROLES } from '../utils/index.js'
+import { LIBRARY, PROFILE_STATUS, PROTOCOLS, ROLES } from '../utils/index.js'
 
 export const getDashboard = async (req, res, next) => {
     try {
@@ -43,6 +43,49 @@ export const getContent = async (req, res, next) => {
 
         for (const [key, filename] of Object.entries(files)) {
             data[key] = `${base_url}/${filename}`
+        }
+
+        return res.status(200).json({
+            success: true,
+            data
+        })
+
+    } catch (error) {
+        logger.error(`Get Content Error: ${error.message}`)
+        next(error)
+    }
+}
+
+export const getData = async (req, res, next) => {
+    try {
+
+        const REHAB_TYPES = [
+            {
+                label: "Protocols",
+                value: "protocol"
+            },
+            {
+                label: "Library",
+                value: "library"
+            },
+        ]
+
+        const PROTOCOL_CATEGORIES = PROTOCOLS.map(item => ({
+            label: item.name,
+            value: item.id
+        }))
+
+        const LIBRARY_CATEGORIES = LIBRARY.map(item => ({
+            label: item.name,
+            value: item.id
+        }))
+
+        const data = {
+            rehab_types: REHAB_TYPES,
+            categories: {
+                protocol: PROTOCOL_CATEGORIES,
+                library: LIBRARY_CATEGORIES
+            }
         }
 
         return res.status(200).json({
