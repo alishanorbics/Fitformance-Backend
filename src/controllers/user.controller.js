@@ -439,14 +439,14 @@ export const assignTherapist = async (req, res, next) => {
             })
         }
 
-        if (user.therapist) {
+        if (user.therapist?.some(t => t.toString() === therapist._id.toString())) {
             return res.status(400).json({
                 success: false,
-                message: 'Therapist already assigned.',
+                message: 'Therapist already assigned to this user.',
             })
         }
 
-        user.therapist = therapist._id
+        user.therapist.push(therapist._id)
         await user.save()
 
         let conversation = await Conversation.findOne({
@@ -455,14 +455,10 @@ export const assignTherapist = async (req, res, next) => {
         })
 
         if (!conversation) {
-
-            let payload = {
+            conversation = new Conversation({
                 participants: [user._id, therapist._id]
-            }
-
-            conversation = new Conversation(payload)
+            })
             await conversation.save()
-
         }
 
         await sendNotification({
@@ -494,7 +490,6 @@ export const assignTherapist = async (req, res, next) => {
     }
 
 }
-
 export const assignDocuments = async (req, res, next) => {
 
     try {

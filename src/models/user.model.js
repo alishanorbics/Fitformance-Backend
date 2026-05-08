@@ -53,10 +53,10 @@ const user_schema = mongoose.Schema({
     device_ids: [{
         type: String
     }],
-    therapist: {
+    therapist: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    },
+    }],
     documents: [{
         type: String
     }],
