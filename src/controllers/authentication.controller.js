@@ -66,12 +66,12 @@ export const signup = async (req, res, next) => {
         const title =
             user?.role === ROLES.USER
                 ? 'New Patient Awaiting Review'
-                : 'New Therapist Awaiting Review'
+                : 'New Practitioner Awaiting Review'
 
         const message =
             user?.role === ROLES.USER
                 ? `A new patient, ${user.name} (${user.email}), has just registered. Please review their profile.`
-                : `A new therapist, ${user.name} (${user.email}), has just registered. Please review their profile.`
+                : `A new practitioner, ${user.name} (${user.email}), has just registered. Please review their profile.`
 
         sendNotification({
             title,
