@@ -70,9 +70,8 @@ export const CONVERSATION_TYPES = {
 export const ENUM_CONVERSATION_TYPES = Object.values(CONVERSATION_TYPES)
 
 export const REHAB_TYPES = {
-    DOCUMENT: 'document',
-    IMAGE: 'image',
-    VIDEO: 'video'
+    PROTOCOL: 'protocol',
+    LIBRARY: 'library',
 }
 
 export const ENUM_REHAB_TYPES = Object.values(REHAB_TYPES)
@@ -174,3 +173,37 @@ export const getFileExtension = (file) => {
     return ext.slice(1)
 
 }
+
+export const PROTOCOLS = [
+    {
+        id: 'knee_replacement',
+        name: 'Knee Replacement'
+    },
+    {
+        id: 'rotator_cuff_repair',
+        name: 'Rotator Cuff Repair'
+    },
+    {
+        id: 'disc_herniation',
+        name: 'Disc Herniation'
+    }
+]
+
+export const LIBRARY = [
+    {
+        id: 'upper_body',
+        name: 'Upper Body'
+    },
+    {
+        id: 'lower_body',
+        name: 'Lower Body'
+    },
+    {
+        id: 'core',
+        name: 'Core'
+    },
+    {
+        id: 'back',
+        name: 'Back'
+    }
+]
