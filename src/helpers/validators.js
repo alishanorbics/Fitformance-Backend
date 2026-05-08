@@ -1,6 +1,10 @@
 import Joi from 'joi'
 import mongoose from 'mongoose'
-import { ENUM_PROFILE_STATUS, ENUM_REHAB_TYPES, ENUM_ROLES, ROLES } from '../utils/index.js'
+import { ENUM_PROFILE_STATUS, ENUM_REHAB_TYPES, ENUM_ROLES, LIBRARY, PROTOCOLS, ROLES } from '../utils/index.js'
+
+const PROTOCOL_IDS = PROTOCOLS.map(item => item.id)
+const LIBRARY_IDS = LIBRARY.map(item => item.id)
+const ALL_CATEGORY_IDS = [...PROTOCOL_IDS, ...LIBRARY_IDS]
 
 export const SIGNUP_VALIDATOR = Joi.object({
 
@@ -371,6 +375,15 @@ export const CREATE_REHAB_VALIDATOR = Joi.object({
             'any.required': 'Type is required.',
             'string.empty': 'Type cannot be empty.',
             'any.only': `Type must be one of: ${ENUM_REHAB_TYPES.join(', ')}`
+        }),
+
+    category: Joi.string()
+        .valid(...ALL_CATEGORY_IDS)
+        .required()
+        .messages({
+            'any.required': 'Category is required.',
+            'string.empty': 'Category cannot be empty.',
+            'any.only': `Category must be one of: ${ALL_CATEGORY_IDS.join(', ')}`
         }),
 
     is_premium: Joi.boolean()
