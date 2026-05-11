@@ -5,7 +5,7 @@ import { sendNotification } from '../helpers/notification.js'
 import { buildPaginationResponse, getPagination } from '../helpers/pagination.js'
 import Conversation from '../models/conversation.model.js'
 import Plan from '../models/plan.model.js'
-import RehabAssignment from '../models/rehabassignment.model.js'
+import Rehab from '../models/rehab.model.js'
 import User from '../models/user.model.js'
 import { calculateProgress } from '../services/excercise.service.js'
 import { fetchDetails, fetchTrending, searchMulti } from '../services/tmdb.service.js'
@@ -17,25 +17,12 @@ export const getHome = async (req, res, next) => {
 
         const { decoded } = req
 
-        const rehab_assignment = await RehabAssignment.find({ user: decoded.id }).populate({ path: "rehab", options: { lean: { virtuals: true } } }).lean({ virtuals: true })
-        const plans = await Plan.find({ user: decoded.id }).lean({ virtuals: true })
-
-        const protocols = []
-        const library = []
-
-        rehab_assignment.forEach((assignment) => {
-
-            if (!assignment.rehab) return
-
-            if (assignment.rehab.type === REHAB_TYPES.DOCUMENT) {
-                protocols.push(assignment.rehab)
-            } else if ([REHAB_TYPES.VIDEO, REHAB_TYPES.IMAGE].includes(assignment.rehab.type)) {
-                library.push(assignment.rehab)
-            }
-
-        })
-
-        const progress = await calculateProgress(decoded.id)
+        const [protocols, library, plans, progress] = await Promise.all([
+            Rehab.find({ type: REHAB_TYPES.PROTOCOL }).lean({ virtuals: true }),
+            Rehab.find({ type: REHAB_TYPES.LIBRARY }).lean({ virtuals: true }),
+            Plan.find({ user: decoded.id }).lean({ virtuals: true }),
+            calculateProgress(decoded.id)
+        ])
 
         logger.info(`Home listing fetched`)
 
@@ -46,9 +33,10 @@ export const getHome = async (req, res, next) => {
         })
 
     } catch (error) {
-        logger.error(`Get Users Error: ${error.message}`)
+        logger.error(`Get Home Error: ${error.message}`)
         next(error)
     }
+    
 }
 
 export const getUsers = async (req, res, next) => {
