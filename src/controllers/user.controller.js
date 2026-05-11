@@ -18,8 +18,8 @@ export const getHome = async (req, res, next) => {
         const { decoded } = req
 
         const [protocols, library, plans, progress] = await Promise.all([
-            Rehab.find({ type: REHAB_TYPES.PROTOCOL }).lean({ virtuals: true }),
-            Rehab.find({ type: REHAB_TYPES.LIBRARY }).lean({ virtuals: true }),
+            Rehab.find({ type: REHAB_TYPES.PROTOCOL }).sort({ createdAt: -1 }).limit(4).lean({ virtuals: true }),
+            Rehab.find({ type: REHAB_TYPES.LIBRARY }).sort({ createdAt: -1 }).limit(4).lean({ virtuals: true }),
             Plan.find({ user: decoded.id }).lean({ virtuals: true }),
             calculateProgress(decoded.id)
         ])
@@ -36,7 +36,7 @@ export const getHome = async (req, res, next) => {
         logger.error(`Get Home Error: ${error.message}`)
         next(error)
     }
-    
+
 }
 
 export const getUsers = async (req, res, next) => {
