@@ -395,51 +395,6 @@ export const CREATE_REHAB_VALIDATOR = Joi.object({
 })
 
 export const CREATE_PLAN_VALIDATOR = Joi.object({
-    exercises: Joi.array()
-        .items(
-            Joi.object({
-                name: Joi.string()
-                    .min(2)
-                    .max(100)
-                    .required()
-                    .messages({
-                        'any.required': 'Exercise name is required.',
-                        'string.empty': 'Exercise name cannot be empty.',
-                        'string.min': 'Exercise name must be at least 2 characters long.',
-                        'string.max': 'Exercise name cannot exceed 100 characters.'
-                    }),
-
-                notes: Joi.string()
-                    .trim()
-                    .min(5)
-                    .max(1000)
-                    .required()
-                    .messages({
-                        'any.required': 'Notes are required.',
-                        'string.empty': 'Notes cannot be empty.',
-                        'string.min': 'Notes must be at least 5 characters long.',
-                        'string.max': 'Notes cannot exceed 1000 characters.'
-                    }),
-
-                frequency: Joi.number()
-                    .integer()
-                    .min(1)
-                    .required()
-                    .messages({
-                        'any.required': 'Frequency is required.',
-                        'number.base': 'Frequency must be a number.',
-                        'number.integer': 'Frequency must be an integer.',
-                        'number.min': 'Frequency must be at least 1.'
-                    }),
-            })
-        )
-        .min(1)
-        .required()
-        .messages({
-            'array.base': 'Exercises must be an array.',
-            'array.min': 'At least one exercise is required.',
-            'any.required': 'Exercises are required.'
-        }),
 
     user: Joi.string()
         .required()
@@ -454,43 +409,60 @@ export const CREATE_PLAN_VALIDATOR = Joi.object({
             'string.empty': 'User ID cannot be empty.'
         }),
 
-    protocol: Joi.array()
-        .items(
-            Joi.string()
-                .custom((value, helpers) => {
-                    if (!mongoose.Types.ObjectId.isValid(value)) {
-                        return helpers.error('any.invalid')
-                    }
-                    return value
-                })
-                .messages({ 'any.invalid': 'Invalid protocol ID' })
-        )
-        .min(1)
+    name: Joi.string()
+        .min(2)
+        .max(100)
         .required()
         .messages({
-            'array.base': 'Protocols must be an array.',
-            'array.min': 'At least one protocol is required.',
-            'any.required': 'Protocols are required.'
+            'any.required': 'Exercise name is required.',
+            'string.empty': 'Exercise name cannot be empty.',
+            'string.min': 'Exercise name must be at least 2 characters long.',
+            'string.max': 'Exercise name cannot exceed 100 characters.'
         }),
 
-    library: Joi.array()
-        .items(
-            Joi.string()
-                .custom((value, helpers) => {
-                    if (!mongoose.Types.ObjectId.isValid(value)) {
-                        return helpers.error('any.invalid')
-                    }
-                    return value
-                })
-                .messages({ 'any.invalid': 'Invalid library ID' })
-        )
+    notes: Joi.string()
+        .trim()
+        .min(5)
+        .max(1000)
+        .required()
+        .messages({
+            'any.required': 'Notes are required.',
+            'string.empty': 'Notes cannot be empty.',
+            'string.min': 'Notes must be at least 5 characters long.',
+            'string.max': 'Notes cannot exceed 1000 characters.'
+        }),
+
+    frequency: Joi.number()
+        .integer()
         .min(1)
         .required()
         .messages({
-            'array.base': 'Library must be an array.',
-            'array.min': 'At least one library item is required.',
-            'any.required': 'Library is required.'
+            'any.required': 'Frequency is required.',
+            'number.base': 'Frequency must be a number.',
+            'number.integer': 'Frequency must be an integer.',
+            'number.min': 'Frequency must be at least 1.'
         }),
+
+    reps: Joi.number()
+        .integer()
+        .min(1)
+        .required()
+        .messages({
+            'any.required': 'Reps are required.',
+            'number.base': 'Reps must be a number.',
+            'number.integer': 'Reps must be an integer.',
+            'number.min': 'Reps must be at least 1.'
+        }),
+
+    weight: Joi.number()
+        .min(1)
+        .required()
+        .messages({
+            'any.required': 'Weight is required.',
+            'number.base': 'Weight must be a number.',
+            'number.min': 'Weight must be at least 1.'
+        }),
+
 })
 
 export const CREATE_PACKAGE_VALIDATOR = Joi.object({

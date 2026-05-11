@@ -90,7 +90,7 @@ export const addPlan = async (req, res, next) => {
 
     try {
         const { body, decoded } = req
-        const { user: user_id, exercises = [], protocol = [], library = [] } = body
+        const { user: user_id, name, notes, frequency, reps, weight } = body
         const therapist = decoded.id
 
         const user = await User.findById(user_id).session(session)
@@ -103,7 +103,7 @@ export const addPlan = async (req, res, next) => {
             })
         }
 
-        if (user.therapist?.toString() !== therapist) {
+        if (!user.therapist?.map(t => t.toString()).includes(therapist)) {
             await session.abortTransaction()
             session.endSession()
             return res.status(403).json({
@@ -112,36 +112,25 @@ export const addPlan = async (req, res, next) => {
             })
         }
 
-        for (const exercise of exercises) {
-            const plan = new Plan({
-                user: user._id,
-                therapist,
-                ...exercise
-            })
-            await plan.save({ session })
-        }
-
-        const rehabs = [...protocol, ...library]
-
-        for (const rehab of rehabs) {
-            const rehab_assignment = new RehabAssignment({
-                user: user._id,
-                therapist,
-                rehab: rehab
-            })
-            await rehab_assignment.save({ session })
-        }
+        const plan = new Plan({
+            user: user._id,
+            therapist,
+            name,
+            notes,
+            frequency,
+            reps,
+            weight
+        })
+        await plan.save({ session })
 
         await session.commitTransaction()
         session.endSession()
 
-        logger.info(
-            `Created plans and rehab assignments by therapist ${therapist} for user ${user._id}`
-        )
+        logger.info(`Plan created by therapist ${therapist} for user ${user._id}`)
 
         return res.status(201).json({
             success: true,
-            message: "All plans and rehab assignments created successfully"
+            message: "Plan created successfully"
         })
 
     } catch (error) {

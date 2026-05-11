@@ -27,6 +27,14 @@ const plan_schema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    reps: {
+        type: Number,
+        required: true,
+    },
+    weight: {
+        type: Number,
+        required: true,
+    },
     status: {
         type: String,
         enum: ENUM_PLAN_STATUS,
