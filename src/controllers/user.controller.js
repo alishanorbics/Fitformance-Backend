@@ -121,7 +121,7 @@ export const getUserById = async (req, res, next) => {
 
         const user = await User.findById(id).select("-password").populate({ path: "therapist", select: "name email phone country_code dialing_code image" }).lean({ virtuals: true })
 
-        if ((!user) || (user && (decoded.role === ROLES.THERAPIST) && (user?.therapist?._id?.toString() !== decoded.id.toString()))) {
+        if ((!user) || (user && (decoded.role === ROLES.THERAPIST) && (!user?.therapist?.map(t => t._id?.toString()).includes(decoded.id.toString())))) {
             return res.status(404).json({
                 success: false,
                 message: "User not found.",
@@ -132,23 +132,7 @@ export const getUserById = async (req, res, next) => {
 
         if (decoded.role === ROLES.THERAPIST) {
 
-            const plans = await Plan.find({ therapist: user.therapist._id, user: user._id }).lean({ virtuals: true })
-            const rehab_assignment = await RehabAssignment.find({ therapist: user.therapist._id, user: user._id }).populate({ path: "rehab", options: { lean: { virtuals: true } } }).lean({ virtuals: true })
-
-            const protocols = []
-            const library = []
-
-            rehab_assignment.forEach((assignment) => {
-
-                if (!assignment.rehab) return
-
-                if (assignment.rehab.type === REHAB_TYPES.DOCUMENT) {
-                    protocols.push(assignment)
-                } else if ([REHAB_TYPES.VIDEO, REHAB_TYPES.IMAGE].includes(assignment.rehab.type)) {
-                    library.push(assignment)
-                }
-
-            })
+            const plans = await Plan.find({ therapist: decoded.id, user: user._id }).lean({ virtuals: true })
 
             const completed_exercises = plans.filter(plan => plan?.status === PLAN_STATUS.COMPLETED).length
 
@@ -157,8 +141,6 @@ export const getUserById = async (req, res, next) => {
                 : 0
 
             payload.plans = plans
-            payload.protocols = protocols
-            payload.library = library
             payload.progress = progress
 
         }
