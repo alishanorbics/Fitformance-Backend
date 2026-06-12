@@ -16,7 +16,7 @@ export const getRehabs = async (req, res, next) => {
         }
 
         if (category) {
-            filter.category_id = category
+            filter.category = category
         }
 
         if (search) {
@@ -28,6 +28,7 @@ export const getRehabs = async (req, res, next) => {
         }
 
         const rehabs = await Rehab.find(filter)
+            .populate("category", "name")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
@@ -53,7 +54,7 @@ export const getRehabById = async (req, res, next) => {
         const { params } = req
         const { id } = params
 
-        const rehab = await Rehab.findById(id)
+        const rehab = await Rehab.findById(id).populate("category", "name")
 
         return res.status(200).json({
             success: true,
@@ -69,7 +70,7 @@ export const getRehabById = async (req, res, next) => {
 
 export const addRehab = async (req, res, next) => {
     try {
-        
+
         const { body, decoded, file } = req
         const { title, description, type, category, is_premium } = body
 
@@ -77,7 +78,7 @@ export const addRehab = async (req, res, next) => {
             title,
             description: description.trim(),
             type,
-            category_id: category,
+            category,
             file: file?.path || null,
             is_premium: is_premium || false,
         })

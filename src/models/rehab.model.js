@@ -19,8 +19,9 @@ const rehab_schema = new mongoose.Schema({
         required: true,
         enum: ENUM_REHAB_TYPES,
     },
-    category_id: {
-        type: String,
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
         required: true
     },
     is_premium: {
@@ -30,6 +31,10 @@ const rehab_schema = new mongoose.Schema({
     file: {
         type: String,
         required: false,
+    },
+    active: {
+        type: Boolean,
+        default: true,
     },
 }, {
     timestamps: true,
@@ -61,20 +66,6 @@ rehab_schema.virtual('file_type').get(function () {
     const file_extension = getFileExtension(this.file)
 
     return file_extension
-
-})
-
-rehab_schema.virtual('category').get(function () {
-
-    if (!this.category_id || !this.type) return null
-
-    const list = this.type === REHAB_TYPES.PROTOCOL ? PROTOCOLS : LIBRARY
-
-    const found = list.find(item => item.id === this.category_id)
-
-    if (!found) return null
-
-    return found
 
 })
 

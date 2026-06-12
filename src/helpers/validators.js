@@ -378,12 +378,16 @@ export const CREATE_REHAB_VALIDATOR = Joi.object({
         }),
 
     category: Joi.string()
-        .valid(...ALL_CATEGORY_IDS)
         .required()
+        .custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.message(`Invalid category ID: ${value}`)
+            }
+            return value
+        })
         .messages({
-            'any.required': 'Category is required.',
-            'string.empty': 'Category cannot be empty.',
-            'any.only': `Category must be one of: ${ALL_CATEGORY_IDS.join(', ')}`
+            'any.required': 'Category ID is required.',
+            'string.empty': 'Category ID cannot be empty.'
         }),
 
     is_premium: Joi.boolean()
@@ -620,4 +624,36 @@ export const UPDATE_STATUS_VALIDATOR = Joi.object({
             'any.only': `Invalid status. Allowed values: ${ENUM_PROFILE_STATUS.join(', ')}`,
             'any.required': 'Status is required.',
         })
+})
+
+export const CREATE_CATEGORY_VALIDATOR = Joi.object({
+    name: Joi.string().min(2).max(100)
+        .required()
+        .messages({
+            'any.required': 'Name is required.',
+            'string.empty': 'Name cannot be empty.',
+            'string.min': 'Name must be at least 2 characters long.',
+            'string.max': 'Name cannot exceed 100 characters.'
+        }),
+
+    type: Joi.string()
+        .valid(...ENUM_REHAB_TYPES)
+        .required()
+        .messages({
+            'any.required': 'Type is required.',
+            'string.empty': 'Type cannot be empty.',
+            'any.only': `Type must be one of: ${ENUM_REHAB_TYPES.join(', ')}`
+        }),
+
+})
+
+export const UPDATE_CATEGORY_VALIDATOR = Joi.object({
+    name: Joi.string().min(2).max(100)
+        .required()
+        .messages({
+            'any.required': 'Name is required.',
+            'string.empty': 'Name cannot be empty.',
+            'string.min': 'Name must be at least 2 characters long.',
+            'string.max': 'Name cannot exceed 100 characters.'
+        }),
 })
