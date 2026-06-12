@@ -3,6 +3,7 @@ import express from "express";
 const router = express.Router()
 
 import auth_routes from './authentication.route.js';
+import category_routes from './category.route.js';
 import conversation_routes from './conversation.route.js';
 import feedback_routes from './feedback.route.js';
 import general_routes from './general.route.js';
@@ -23,5 +24,6 @@ router.use('/package', package_routes)
 router.use('/notification', notification_routes)
 router.use('/feedback', feedback_routes)
 router.use('/general', general_routes)
+router.use('/category', category_routes)
 
 export default router
