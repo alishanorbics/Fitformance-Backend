@@ -477,6 +477,8 @@ export const handleTherapistAssignment = async (req, res, next) => {
 
             logger.info(`Therapist assigned successfully | User: ${user.email} | Therapist: ${therapist.email}`)
 
+            await Plan.updateMany({ user: user._id, therapist: therapist._id, active: false }, { $set: { active: true } })
+
             return res.status(200).json({
                 success: true,
                 message: "Practitioner assigned to user successfully.",
