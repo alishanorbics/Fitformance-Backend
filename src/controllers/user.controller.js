@@ -20,7 +20,7 @@ export const getHome = async (req, res, next) => {
         const [protocols, library, plans, progress] = await Promise.all([
             Rehab.find({ type: REHAB_TYPES.PROTOCOL }).sort({ createdAt: -1 }).limit(4).lean({ virtuals: true }),
             Rehab.find({ type: REHAB_TYPES.LIBRARY }).sort({ createdAt: -1 }).limit(4).lean({ virtuals: true }),
-            Plan.find({ user: decoded.id }).lean({ virtuals: true }),
+            Plan.find({ user: decoded.id, active: true }).lean({ virtuals: true }),
             calculateProgress(decoded.id)
         ])
 
@@ -132,7 +132,7 @@ export const getUserById = async (req, res, next) => {
 
         if (decoded.role === ROLES.THERAPIST) {
 
-            const plans = await Plan.find({ therapist: decoded.id, user: user._id }).lean({ virtuals: true })
+            const plans = await Plan.find({ therapist: decoded.id, user: user._id, active: true }).lean({ virtuals: true })
 
             const completed_exercises = plans.filter(plan => plan?.status === PLAN_STATUS.COMPLETED).length
 
@@ -385,7 +385,7 @@ export const updateStatus = async (req, res, next) => {
     }
 }
 
-export const assignTherapist = async (req, res, next) => {
+export const handleTherapistAssignment = async (req, res, next) => {
 
     try {
 
@@ -409,57 +409,89 @@ export const assignTherapist = async (req, res, next) => {
             })
         }
 
-        if (user.therapist?.some(t => t.toString() === therapist._id.toString())) {
-            return res.status(400).json({
-                success: false,
-                message: 'Therapist already assigned to this user.',
+        const therapist_index = user.therapist?.findIndex(t => t.toString() === therapist._id.toString())
+        const therapist_exists = therapist_index !== -1
+
+        if (therapist_exists) {
+
+            user.therapist.splice(therapist_index, 1)
+            await user.save()
+
+            await sendNotification({
+                title: "Therapist Removed",
+                message: "A therapist has been removed from your account.",
+                user_ids: [user._id],
+                metadata: { type: "therapist_removed", therapist: therapist._id },
+                push: true
+            })
+
+            await sendNotification({
+                title: "Client Assignment Removed",
+                message: "A client assignment has been removed from your account.",
+                user_ids: [therapist._id],
+                metadata: { type: "client_assignment_removed", user: user._id },
+                push: true
+            })
+
+            logger.info(`Therapist removed successfully | User: ${user.email} | Therapist: ${therapist.email}`)
+
+            await Plan.updateMany({ user: user._id, therapist: therapist._id, active: true }, { $set: { active: false } })
+
+            return res.status(200).json({
+                success: true,
+                message: "Therapist removed from user successfully.",
+                action: 'removed'
+            })
+
+        } else {
+
+            user.therapist.push(therapist._id)
+            await user.save()
+
+            let conversation = await Conversation.findOne({
+                type: CONVERSATION_TYPES.PRIVATE,
+                participants: { $all: [user._id, therapist._id] }
+            })
+
+            if (!conversation) {
+                conversation = new Conversation({
+                    participants: [user._id, therapist._id]
+                })
+                await conversation.save()
+            }
+
+            await sendNotification({
+                title: "Therapist Assigned",
+                message: "A therapist has been assigned to your account. Communication is now available via the application.",
+                user_ids: [user._id],
+                metadata: { type: "therapist_assigned", therapist: therapist._id },
+                push: true
+            })
+
+            await sendNotification({
+                title: "New Client Assignment",
+                message: "You have been assigned a new client. Please review the assignment and proceed according to your workflow.",
+                user_ids: [therapist._id],
+                metadata: { type: "new_client_assigned", user: user._id },
+                push: true
+            })
+
+            logger.info(`Therapist assigned successfully | User: ${user.email} | Therapist: ${therapist.email}`)
+
+            return res.status(200).json({
+                success: true,
+                message: "Therapist assigned to user successfully.",
+                action: 'assigned'
             })
         }
-
-        user.therapist.push(therapist._id)
-        await user.save()
-
-        let conversation = await Conversation.findOne({
-            type: CONVERSATION_TYPES.PRIVATE,
-            participants: { $all: [user._id, therapist._id] }
-        })
-
-        if (!conversation) {
-            conversation = new Conversation({
-                participants: [user._id, therapist._id]
-            })
-            await conversation.save()
-        }
-
-        await sendNotification({
-            title: "Therapist Assigned",
-            message: "A therapist has been assigned to your account. Communication is now available via the application.",
-            user_ids: [user._id],
-            metadata: { type: "therapist_assigned", therapist: therapist._id },
-            push: true
-        })
-
-        await sendNotification({
-            title: "New Client Assignment",
-            message: "You have been assigned a new client. Please review the assignment and proceed according to your workflow.",
-            user_ids: [therapist._id],
-            metadata: { type: "new_client_assigned", user: user._id },
-            push: true
-        })
-
-        logger.info(`Therapist assigned successfully | User: ${user.email} | Therapist: ${therapist.email}`)
-
-        return res.status(200).json({
-            success: true,
-            message: "Therapist assigned to user successfully.",
-        })
 
     } catch (error) {
-        logger.error(`Assign Therapist Error: ${error.message}`)
+        logger.error(`Handle Therapist Assignment Error: ${error.message}`)
         next(error)
     }
 
 }
+
 export const assignDocuments = async (req, res, next) => {
 
     try {

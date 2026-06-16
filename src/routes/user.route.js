@@ -1,5 +1,5 @@
 import express from 'express'
-import { assignDocuments, assignTherapist, changePassword, deleteAssignedDocument, getHome, getMediaById, getMyProfile, getTrending, getUserById, getUsers, removeImage, search, toggleStatus, updateProfile, updateStatus } from '../controllers/user.controller.js'
+import { assignDocuments, changePassword, deleteAssignedDocument, getHome, getMediaById, getMyProfile, getTrending, getUserById, getUsers, handleTherapistAssignment, removeImage, search, toggleStatus, updateProfile, updateStatus } from '../controllers/user.controller.js'
 import { ASSIGN_THERAPIST_VALIDATOR, CHANGE_PASSWORD_VALIDATOR, UPDATE_PROFILE_VALIDATOR, UPDATE_STATUS_VALIDATOR } from '../helpers/validators.js'
 import { AuthVerifier, RoleGuard } from '../middleware/auth.middleware.js'
 import upload from '../middleware/upload.middleware.js'
@@ -26,7 +26,7 @@ router.patch('/update-status/:id', AuthVerifier, validator(UPDATE_STATUS_VALIDAT
 
 router.post('/remove-image', AuthVerifier, removeImage)
 
-router.post('/assign-therapist', AuthVerifier, validator(ASSIGN_THERAPIST_VALIDATOR), assignTherapist)
+router.post('/handle-therapist-assignment', AuthVerifier, validator(ASSIGN_THERAPIST_VALIDATOR), handleTherapistAssignment)
 
 router.post('/assign-documents', AuthVerifier, RoleGuard(ROLES.THERAPIST), upload("user_documents").array("documents"), assignDocuments)
 

@@ -39,6 +39,10 @@ const plan_schema = new mongoose.Schema({
         type: String,
         enum: ENUM_PLAN_STATUS,
         default: PLAN_STATUS.PENDING
+    },
+    active: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true,

@@ -2,7 +2,6 @@ import mongoose from "mongoose"
 import logger from "../config/logger.js"
 import { buildPaginationResponse, getPagination } from "../helpers/pagination.js"
 import Plan from "../models/plan.model.js"
-import RehabAssignment from "../models/rehabassignment.model.js"
 import User from "../models/user.model.js"
 import { calculateProgress } from "../services/excercise.service.js"
 import { dateRangeFilter, PLAN_STATUS, ROLES, searchRegex } from "../utils/index.js"
@@ -29,9 +28,11 @@ export const getPlans = async (req, res, next) => {
 
             filter.user = decoded.id
             filter.therapist = user.therapist
+            filter.active = true
 
         } else if (decoded.role === ROLES.THERAPIST) {
             filter.therapist = decoded.id
+            filter.active = true
         }
 
         if (search) {
