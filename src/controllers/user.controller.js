@@ -439,8 +439,7 @@ export const handleTherapistAssignment = async (req, res, next) => {
 
             return res.status(200).json({
                 success: true,
-                message: "Therapist removed from user successfully.",
-                action: 'removed'
+                message: "Practitioner removed from user successfully.",
             })
 
         } else {
@@ -480,8 +479,7 @@ export const handleTherapistAssignment = async (req, res, next) => {
 
             return res.status(200).json({
                 success: true,
-                message: "Therapist assigned to user successfully.",
-                action: 'assigned'
+                message: "Practitioner assigned to user successfully.",
             })
         }
 
